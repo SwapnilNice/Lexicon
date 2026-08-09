@@ -153,7 +153,9 @@ def run_pipeline(
 
     raws = _extract(all_docs)
     fields = _enrich(raws)
-    proposed = propose_mapping(fields, report=report)
+    # Pass the vendor slug so the mapper can honor any hand-authored dialect
+    # at `ontology/<slug>_dialect.yaml` as a high-confidence override.
+    proposed = propose_mapping(fields, report=report, vendor_slug=entry.slug)
 
     catalog_path  = catalogs_dir / f"{entry.slug}.yaml"
     proposed_path = proposed_dir / f"{entry.slug}.{report}.PROPOSED.yaml"

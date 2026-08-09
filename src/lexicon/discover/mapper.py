@@ -277,14 +277,93 @@ def _propose_leaf(
     )
 
 
+# ---------------------------------------------------------------------------
+# Dialect overrides — if a vendor has a hand-authored dialect file, use its
+# formulas as high-confidence overrides. This is the "human ratifies" step
+# in the AI-proposes / harness-verifies / human-ratifies loop.
+# ---------------------------------------------------------------------------
+def _load_dialect(vendor_slug: str, report: str) -> dict[str, dict]:
+    """Return {canonical_field: {formula, rule, trap, confirmed, ...}} from
+    ontology/<slug>_dialect.yaml if it exists. Section key matches report."""
+    path = ROOT / "ontology" / f"{vendor_slug}_dialect.yaml"
+    if not path.exists():
+        return {}
+    try:
+        raw = yaml.safe_load(path.read_text()) or {}
+    except yaml.YAMLError:
+        return {}
+    section = REPORT_SECTION.get(report, report)
+    return (raw.get(section) or {}) if isinstance(raw.get(section), dict) else {}
+
+
+_DIALECT_PLACEHOLDER_TOKENS = {"derived", "n/a", "na", "tbd", "todo", "unknown", "?", ""}
+
+
+def _dialect_to_formula(entry: dict) -> str | None:
+    """Extract an executable-ish formula from a dialect entry.
+
+    Dialect entries have either an explicit `formula:` (for compositions like
+    "(x + y) * n") or an implicit single-token formula whose value is the
+    only vendor term in `<vendor_slug>:` list.
+
+    Returns None if the entry only carries placeholder tokens (e.g. "derived",
+    "n/a", "tbd") — those signal "no direct mapping; compute externally" and
+    should NOT block the normal composition path."""
+    formula = entry.get("formula")
+    if formula:
+        formula_str = str(formula).strip()
+        if formula_str.lower() not in _DIALECT_PLACEHOLDER_TOKENS:
+            return formula_str
+    # Fallback: find the vendor-terms key. Skip metadata keys.
+    metadata_keys = {"rule", "trap", "confirmed", "formula", "note"}
+    for k, v in entry.items():
+        if k in metadata_keys:
+            continue
+        # v is expected to be a list of vendor terms.
+        candidate: str | None = None
+        if isinstance(v, list) and len(v) == 1:
+            candidate = str(v[0])
+        elif isinstance(v, str):
+            candidate = v
+        if candidate is not None:
+            if candidate.strip().lower() in _DIALECT_PLACEHOLDER_TOKENS:
+                return None
+            return candidate
+    return None
+
+
 def propose_mapping(
     fields: list[EnrichedField],
     *,
     report: str = "queue",
+    vendor_slug: str | None = None,
 ) -> dict[str, ProposedField]:
     section = REPORT_SECTION[report]
+    dialect = _load_dialect(vendor_slug, report) if vendor_slug else {}
     out: dict[str, ProposedField] = {}
     for cf in _canonical_fields_for_report(report):
+        # Dialect override — highest priority if present and has a formula.
+        if cf in dialect:
+            formula = _dialect_to_formula(dialect[cf])
+            if formula:
+                confirmed = bool(dialect[cf].get("confirmed"))
+                rule = dialect[cf].get("rule", "")
+                trap = dialect[cf].get("trap")
+                rationale_parts = [f"dialect override from ontology/{vendor_slug}_dialect.yaml"]
+                if rule:
+                    rationale_parts.append(rule)
+                if trap:
+                    rationale_parts.append(f"TRAP: {trap}")
+                out[cf] = ProposedField(
+                    formula=formula,
+                    # Confirmed dialect entries → 0.95 (structural, human-verified).
+                    # Unconfirmed → 0.70 (structural but needs SME sign-off).
+                    confidence=0.95 if confirmed else 0.70,
+                    rationale=" | ".join(rationale_parts),
+                    needs_review=not confirmed,
+                )
+                continue
+
         spec = (CANON[section] or {}).get(cf, {})
         unit = spec.get("unit", "count")
         if "derivation" in spec:

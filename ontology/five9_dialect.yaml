@@ -1,0 +1,138 @@
+# Five9 Virtual Contact Center → canonical WFM dialect.
+#
+# Manually authored. Five9's public PDF documentation isn't machine-friendly
+# enough for reliable automated extraction, but the vendor's semantic model
+# is well-understood. This dialect captures the human-verified mapping.
+#
+# STATUS: proposed — needs a Five9 subject-matter expert to confirm the
+# metric names against the customer's Five9 version (metric naming has
+# drifted across VCC releases). Fields marked `confirmed: false` need
+# specific sign-off before being used in production.
+
+meta:
+  vendor: "Five9"
+  system: "Five9 Virtual Contact Center (Statistics API + Dashboard reports)"
+  media_scope: immediate_response
+  authored_at: 2026-08-10
+  authored_by: "Swapnil Zade (via Lexicon dialect authoring)"
+  source:
+    - name: "Five9 Dashboard & Report Catalog"
+      url: https://documentation-be.five9.com/bundle/dashboard-report-catalog/raw/resource/enus/dashboard-report-catalog.pdf
+    - name: "Five9 Statistics API (Supervisor WebService WSDL)"
+      url: "https://api.five9.com/wssupervisor/v13_0/SupervisorWebService?wsdl (auth-gated)"
+
+  notes: |
+    KEY SEMANTIC TRAP — Five9 documents "Handle Time" as:
+        Handle Time = Talk Time + Hold Time + Wrap Time (ACW)
+    WFM's HandleTime EXCLUDES ACW (that goes to WorkTime). Do NOT map
+    Five9's Handle Time straight to WFM's HandleTime. Compose from
+    Five9's Talk + Hold instead. This dialect does the right thing.
+
+# --------------------------------------------------------------------------
+# QUEUE report — canonical field → Five9 formula
+# --------------------------------------------------------------------------
+queue:
+  QueueValue:
+    five9: [skill]
+    rule: "Skill name (Five9's routing entity for queue-style routing) or Campaign name for outbound."
+    confirmed: false
+
+  HandledLong:
+    five9: [callsHandled]
+    rule: "Total handled ACD calls in the interval."
+    confirmed: false
+
+  HandledShort:
+    five9: [callsAcceptable]
+    rule: "Calls answered within Service Level threshold."
+    confirmed: false
+
+  AbandonedLong:
+    five9: [callsAbandoned]
+    rule: "Calls abandoned by the customer before an agent accepted."
+    confirmed: false
+
+  AbandonedShort:
+    five9: [callsAbandonedInSLA]
+    rule: "Abandons within the Service Level threshold. If not tracked separately, put 0 and put total in AbandonedLong."
+    confirmed: false
+
+  HandleTime:
+    five9: [averageTalkTime, averageHoldTime, callsHandled]
+    rule: "HandleTime = TALK + HOLD, excluding ACW. Five9 exposes averages, so multiply by callsHandled."
+    formula: "(averageTalkTime + averageHoldTime) * callsHandled"
+    trap: "Do NOT use Five9's `averageHandleTime` — that INCLUDES wrap (ACW), which WFM keeps separate as WorkTime."
+    confirmed: false
+
+  HoldTime:
+    five9: [averageHoldTime, callsHandled]
+    rule: "Total hold time = average * count."
+    formula: "averageHoldTime * callsHandled"
+    confirmed: false
+
+  WorkTime:
+    five9: [averageWrapTime, callsHandled]
+    rule: "Total ACW time = average wrap * count."
+    formula: "averageWrapTime * callsHandled"
+    trap: "Wrap = ACW = After Call Work. Kept SEPARATE from HandleTime."
+    confirmed: false
+
+  QueueDelayTime:
+    five9: [averageQueueTime, callsHandled]
+    rule: "Total queue wait time = average queue time * calls handled (approximation; ignores abandoned)."
+    formula: "averageQueueTime * callsHandled"
+    confirmed: false
+
+  ContactsActive:
+    five9: [callsInQueue]
+    rule: "Calls currently waiting in queue (real-time snapshot; approximates carryover if sampled at interval boundary)."
+    confirmed: false
+
+# --------------------------------------------------------------------------
+# AGENT-QUEUE report — per-agent, per-skill
+# --------------------------------------------------------------------------
+agent_queue:
+  QueueValue: { five9: [skill],       rule: "Skill (see queue.QueueValue).", confirmed: false }
+  AgentValue: { five9: [agentId],     rule: "Five9 agent identifier — logon name or system ID.", confirmed: false }
+  Handled:    { five9: [callsHandled], rule: "Handled ACD calls by this agent on this skill.", confirmed: false }
+  HandleTime: { five9: [averageTalkTime, averageHoldTime, callsHandled],
+                rule: "TALK + HOLD * count.",
+                formula: "(averageTalkTime + averageHoldTime) * callsHandled",
+                confirmed: false }
+  HoldTime:   { five9: [averageHoldTime, callsHandled],
+                formula: "averageHoldTime * callsHandled", confirmed: false }
+  WorkTime:   { five9: [averageWrapTime, callsHandled],
+                formula: "averageWrapTime * callsHandled", confirmed: false }
+
+# --------------------------------------------------------------------------
+# AGENT-SYSTEM report — per-agent, cross-skill (session-level)
+# --------------------------------------------------------------------------
+agent_system:
+  AgentValue:       { five9: [agentId], confirmed: false }
+  ReadyTime:        { five9: [timeReady], rule: "Total time in Ready state during interval.", confirmed: false }
+  NotReadyTime:     { five9: [timeNotReady], rule: "Total time in Not-Ready (excluding ACW).", confirmed: false }
+  LoginTime:        { five9: [timeLoggedIn], rule: "Total time logged in.", confirmed: false }
+  OutboundContacts: { five9: [outboundCallsPlaced], confirmed: false }
+  OutboundHandleTime: { five9: [averageOutboundTalkTime, outboundCallsPlaced],
+                        formula: "averageOutboundTalkTime * outboundCallsPlaced",
+                        confirmed: false }
+
+# --------------------------------------------------------------------------
+# Drift watchlist — vendor terms that should NOT appear in canonical output.
+# The sensor uses this to catch vocabulary leaks.
+# --------------------------------------------------------------------------
+drift_watchlist:
+  vendor_terms:
+    - skill
+    - callsHandled
+    - callsAcceptable
+    - callsAbandoned
+    - averageHandleTime         # semantic trap — see meta.notes
+    - averageTalkTime
+    - averageHoldTime
+    - averageWrapTime
+    - averageQueueTime
+    - agentId
+    - timeReady
+    - timeNotReady
+    - timeLoggedIn
