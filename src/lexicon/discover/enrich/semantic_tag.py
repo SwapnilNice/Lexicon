@@ -12,6 +12,19 @@ import re
 from ..models import EnrichedField, SemanticTag
 
 
+# TAG_LEXICON is match-vocabulary ONLY.
+#
+# The keyword lists below contain vendor-specific tokens (Avaya's "acdtime",
+# Genesys's "tTalk", etc.) so the tagger can recognize them in field names
+# and descriptions. These tokens are NEVER emitted:
+#   - `SemanticTag.rationale` is a synthetic string ("keyword lexicon match
+#     (score=X)"), not a copy of the matched keyword.
+#   - The vendor field names that DO appear in `PROPOSED.yaml` (rationale
+#     strings like "composed from ['acdtime', 'holdtime']") come from the
+#     enriched fields extracted from vendor docs — which is exactly what a
+#     mapping file must say. That is not the "canonical output" CLAUDE.md
+#     rule 4 restricts (that rule scopes to the WFM Import History XML that
+#     `engine.py` produces).
 TAG_LEXICON: dict[str, set[str]] = {
     # duration concepts
     "talk_time_like":       {"talk", "acdtime", "ttalk", "converse"},

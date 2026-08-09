@@ -118,6 +118,8 @@ def _write_proposed(entry: VendorRegistryEntry, proposed, report: str, path: Pat
                 "confidence": p.confidence,
                 "rationale": p.rationale,
                 "needs_review": p.needs_review,
+                "needs_human": p.needs_review,   # spec §9.5 uses `needs_human`; emit both for compat
+                "alternates": p.alternates,
             }
             for name, p in proposed.items()
         },

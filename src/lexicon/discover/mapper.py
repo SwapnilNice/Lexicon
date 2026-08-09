@@ -84,8 +84,14 @@ def _pick_best(
     tag: str,
     target_unit: str,
     forbid_tags: set[str] = frozenset(),
-) -> tuple[EnrichedField | None, float]:
-    best, best_score = None, 0.0
+) -> tuple[EnrichedField | None, float, list[tuple[EnrichedField, float]]]:
+    """Return (best, best_score, alternates).
+
+    `alternates` is a list of (field, score) tuples whose score is within 5%
+    of `best_score`, excluding the best field itself.  Used by callers to
+    populate ProposedField.alternates per spec §9.5.
+    """
+    scored: list[tuple[EnrichedField, float]] = []
     for f in fields:
         if any(t.tag in forbid_tags for t in f.semantic_tags):
             continue
@@ -108,9 +114,17 @@ def _pick_best(
             continue
         uc = (f.unit_confidence or 0.5) if not unit_unknown_as_count else 0.7
         score = w * uc
-        if score > best_score:
-            best, best_score = f, score
-    return best, best_score
+        scored.append((f, score))
+
+    if not scored:
+        return None, 0.0, []
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+    best, best_score = scored[0]
+    # Alternates: candidates within 5% of best_score (excluding the best itself).
+    threshold = best_score * 0.95
+    alts = [(f, s) for f, s in scored[1:] if s >= threshold]
+    return best, best_score, alts
 
 
 def _operand(field: EnrichedField, target_unit: str) -> str:
@@ -136,8 +150,10 @@ def _propose_composed(
     weights: list[float] = []
     picked_names: list[str] = []
     missing = []
+    first_comp_alts: list[tuple[EnrichedField, float]] = []
+    first_comp = True
     for comp in d["components"]:
-        f, s = _pick_best(fields, comp["tag"], canon_unit, forbid_tags=forbid)
+        f, s, alts = _pick_best(fields, comp["tag"], canon_unit, forbid_tags=forbid)
         if f is None:
             if comp.get("required", True):
                 missing.append(comp["tag"])
@@ -145,6 +161,11 @@ def _propose_composed(
         placeholders[comp["placeholder"]] = _operand(f, canon_unit)
         weights.append(s)
         picked_names.append(f.name)
+        # Only capture alternates for the first component: the full composition
+        # is combinatorial and keeping all combinations would be overwhelming.
+        if first_comp:
+            first_comp_alts = alts
+            first_comp = False
     if missing:
         return ProposedField(
             formula=None, confidence=0.0,
@@ -159,11 +180,20 @@ def _propose_composed(
     formula = d["formula"].format(**placeholders)
     has_structural = all(w > 0.0 for w in weights)
     conf = _cap_confidence(min(weights), has_structural=has_structural)
+    alt_list = [
+        {
+            "formula": _operand(af, canon_unit),
+            "confidence": round(_cap_confidence(as_, has_structural=True), 2),
+            "note": f"alternate first-component match: {af.name}",
+        }
+        for af, as_ in first_comp_alts
+    ]
     return ProposedField(
         formula=formula,
         confidence=round(conf, 2),
         rationale=f"composed from {picked_names} per derivation",
         needs_review=conf < 0.6,
+        alternates=alt_list,
     )
 
 
@@ -175,15 +205,32 @@ def _propose_leaf(
     # LONG_DIFF fields: total - within_sl
     if field_name in LONG_DIFF:
         total_tag, sl_tag = LONG_DIFF[field_name]
-        total, ts = _pick_best(fields, total_tag, canon_unit)
-        sl,    ss = _pick_best(fields, sl_tag,    canon_unit)
+        total, ts, total_alts = _pick_best(fields, total_tag, canon_unit)
+        sl,    ss, sl_alts   = _pick_best(fields, sl_tag,    canon_unit)
         if total and sl:
             conf = _cap_confidence(min(ts, ss), has_structural=True)
+            # Emit alternates from both sides combined (per spec §9.5 guidance).
+            alt_list = [
+                {
+                    "formula": _operand(af, canon_unit),
+                    "confidence": round(_cap_confidence(as_, has_structural=True), 2),
+                    "note": f"alternate total match: {af.name}",
+                }
+                for af, as_ in total_alts
+            ] + [
+                {
+                    "formula": _operand(af, canon_unit),
+                    "confidence": round(_cap_confidence(as_, has_structural=True), 2),
+                    "note": f"alternate within-SL match: {af.name}",
+                }
+                for af, as_ in sl_alts
+            ]
             return ProposedField(
                 formula=f"{_operand(total, canon_unit)} - {_operand(sl, canon_unit)}",
                 confidence=round(conf, 2),
                 rationale=f"{total.name} - {sl.name}",
                 needs_review=conf < 0.6,
+                alternates=alt_list,
             )
         if total:
             return ProposedField(
@@ -205,7 +252,7 @@ def _propose_leaf(
             rationale=f"no tag mapping for canonical field {field_name}",
             needs_review=True,
         )
-    best, score = _pick_best(fields, tag, canon_unit)
+    best, score, alts = _pick_best(fields, tag, canon_unit)
     if best is None:
         return ProposedField(
             formula=None, confidence=0.0,
@@ -213,11 +260,20 @@ def _propose_leaf(
             needs_review=True,
         )
     conf = _cap_confidence(score, has_structural=True)
+    alt_list = [
+        {
+            "formula": _operand(af, canon_unit),
+            "confidence": round(_cap_confidence(as_, has_structural=True), 2),
+            "note": f"alternate {tag} match: {af.name}",
+        }
+        for af, as_ in alts
+    ]
     return ProposedField(
         formula=_operand(best, canon_unit),
         confidence=round(conf, 2),
         rationale=f"best {tag} match: {best.name} (weight={score:.2f})",
         needs_review=conf < 0.6,
+        alternates=alt_list,
     )
 
 
