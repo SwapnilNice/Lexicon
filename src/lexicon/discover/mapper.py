@@ -92,14 +92,22 @@ def _pick_best(
         w = _weight_for_tag(f, tag)
         if w < 0.4:
             continue
+        # "key" is always unit-compatible (keys carry no numeric unit).
+        # "count" also accepts "unknown": count fields often lack an explicit
+        # "count of …" phrase, so unit inference returns unknown; we still match
+        # them but apply a small confidence penalty (0.7 multiplier) so fields
+        # with explicit count inference are preferred when both exist.
+        unit_unknown_as_count = (target_unit == "count" and f.unit == "unknown")
         unit_ok = (
             f.unit == target_unit
             or (target_unit == "duration_seconds" and f.unit == "duration_ms")
-            or target_unit == "key"                        # keys are always OK
+            or target_unit == "key"
+            or unit_unknown_as_count
         )
         if not unit_ok:
             continue
-        score = w * (f.unit_confidence or 0.5)
+        uc = (f.unit_confidence or 0.5) if not unit_unknown_as_count else 0.7
+        score = w * uc
         if score > best_score:
             best, best_score = f, score
     return best, best_score
