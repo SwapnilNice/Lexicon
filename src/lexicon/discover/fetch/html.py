@@ -16,6 +16,7 @@ import httpx
 
 from ..cache import DiskCache
 from ..models import RegistrySource, SourceDoc
+from . import js_render
 
 
 def _default_fetcher(url: str) -> bytes:
@@ -174,6 +175,20 @@ def fetch_html_source(
         )]
 
     content = body.decode("utf-8", errors="ignore")
+
+    # If the initial fetch returned a JavaScript-rendered SPA shell (no real
+    # content until JS runs), retry via a headless browser. The rendered
+    # HTML is cached under a "http_js" namespace so subsequent runs don't
+    # re-launch Chromium.
+    if js_render.looks_like_js_shell(content) and js_render.is_available() and not cache.offline:
+        rendered = cache.get("http_js", source.url)
+        if rendered is None:
+            rendered_html = js_render.fetch_rendered_html(source.url)
+            if rendered_html:
+                cache.put("http_js", source.url, rendered_html.encode("utf-8"))
+                content = rendered_html
+        else:
+            content = rendered.decode("utf-8", errors="ignore")
 
     if _looks_like_markdown(source.url, content):
         doc_id = f"md:{hashlib.sha256(source.url.encode()).hexdigest()[:12]}"

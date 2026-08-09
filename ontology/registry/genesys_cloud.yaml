@@ -10,15 +10,23 @@ description: >
   via the Analytics API (Conversation aggregates).
 
 sources:
-  - kind: html_doc
-    role: primary
-    url: https://developer.genesys.cloud/analyticsdatamanagement/analytics/detail/aggregations
-    crawl:
-      max_depth: 2
-      max_pages: 30
+  # Genesys publishes the full Platform API OpenAPI spec as a static JSON in
+  # their public SDK repo. This is the source of truth for the data model
+  # (Analytics Aggregate response shapes, presence types, conversation
+  # objects, etc.). ~10MB, updated on every SDK release.
   - kind: openapi
     role: primary
-    url: https://api.mypurecloud.com/api/v2/docs/swagger.json
+    url: https://raw.githubusercontent.com/MyPureCloud/platform-client-sdk-python/master/swagger.json
+
+  # Developer center pages (JS-rendered SPA — v1 fetcher can't extract from
+  # these without a headless browser). Kept as human-readable reference
+  # links only; extraction requires the JS-rendering fetcher (sub-project B1).
+  - kind: html_doc
+    role: secondary
+    url: https://developer.genesys.cloud/analyticsdatamanagement/analytics/aggregate/conversation-query
+    crawl:
+      max_depth: 0
+      max_pages: 1
 
 access:
   - method: rest_api
