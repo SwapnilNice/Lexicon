@@ -67,6 +67,15 @@ def validate(bp: ParsedBlueprint, schema: SchemaDef, events: EventTaxonomy) -> l
                 f"produces_events contains {ev!r} which is not in events.yaml",
             ))
 
+    # --- 4a. All non-optional events must appear in produces_events ---
+    declared_events = set(fm.get("produces_events") or [])
+    for ev_name, ev_def in events.events.items():
+        if not ev_def.optional and ev_name not in declared_events:
+            errors.append(_err(
+                bp.path, "frontmatter",
+                f"non-optional event {ev_name!r} must appear in produces_events",
+            ))
+
     # --- 5. last_verified freshness (warning at 6mo, error at 12mo) ---
     lv = fm.get("last_verified")
     if isinstance(lv, date):
