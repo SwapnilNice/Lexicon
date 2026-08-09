@@ -46,11 +46,12 @@ st.set_page_config(
     page_icon="🔎",
 )
 
-REGISTRY_DIR = ROOT / "ontology" / "registry"
-CATALOGS_DIR = ROOT / "fixtures" / "vendor_catalogs"
-PROPOSED_DIR = ROOT / "ontology" / "proposed"
-REPORTS_DIR  = ROOT / "out" / "discovery_reports"
-CACHE_DIR    = ROOT / "state" / "discovery_cache"
+REGISTRY_DIR   = ROOT / "ontology" / "registry"
+CATALOGS_DIR   = ROOT / "fixtures" / "vendor_catalogs"
+PROPOSED_DIR   = ROOT / "ontology" / "proposed"
+REPORTS_DIR    = ROOT / "out" / "discovery_reports"
+CACHE_DIR      = ROOT / "state" / "discovery_cache"
+BLUEPRINTS_DIR = ROOT / "ontology" / "blueprints"
 
 
 # ---------------------------------------------------------------------------
@@ -128,43 +129,121 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 if run:
     st.session_state.last_error = None
-    with st.spinner(f"Running discovery pipeline for `{vendor}`…"):
+    st.session_state.last_run = None
+    st.session_state.pop("flow_configured", None)
+    with st.spinner(f"Resolving `{vendor}`…"):
         try:
             cache = DiskCache(CACHE_DIR, offline=offline)
             llm = LLMClient(cache=cache, offline=offline)
             entries = load_registry(REGISTRY_DIR)
             resolve = resolve_vendor_with_fallback(vendor, entries, llm)
-            r = run_pipeline(
-                entry=resolve.entry, cache=cache, llm=llm,
-                catalogs_dir=CATALOGS_DIR,
-                proposed_dir=PROPOSED_DIR,
-                reports_dir=REPORTS_DIR,
-                report=report,
-            )
-            st.session_state.last_run = {
-                "slug": resolve.entry.slug,
-                "resolved_via": resolve.resolved_via,
-                "report": report,
-                "n_found": r.n_found,
-                "n_fields": r.n_fields,
-                "catalog_path": str(r.catalog_path),
-                "proposed_path": str(r.proposed_path),
-                "report_path":  str(r.report_path),
-            }
         except ResolveError as e:
             st.session_state.last_error = f"Vendor resolution failed: {e}"
+            resolve = None
         except Exception as e:  # noqa: BLE001
             import traceback
             st.session_state.last_error = (
-                f"Pipeline failed: {e}\n\n"
+                f"Resolve failed: {e}\n\n"
                 f"```\n{traceback.format_exc()}\n```"
             )
+            resolve = None
+
+    # ----------------------------------------------------------------------
+    # Route by vendor category. Fixed-schema vendors run through the
+    # extraction pipeline (sub-project A). Flow-configured platforms
+    # (Salesforce, Dynamics 365, ServiceNow CX, …) are NOT extractable —
+    # their data model is emergent from admin configuration. Route those
+    # to their Flow Blueprint(s) instead of running an extractor that
+    # will always return 0/N.
+    # ----------------------------------------------------------------------
+    if resolve is not None and resolve.entry.category == "flow_configured":
+        blueprints = sorted((BLUEPRINTS_DIR / resolve.entry.slug).glob("*.md"))
+        st.session_state.flow_configured = {
+            "slug": resolve.entry.slug,
+            "name": resolve.entry.name,
+            "description": resolve.entry.description,
+            "blueprint_paths": [str(p) for p in blueprints],
+        }
+    elif resolve is not None:
+        with st.spinner(f"Running discovery pipeline for `{resolve.entry.slug}`…"):
+            try:
+                r = run_pipeline(
+                    entry=resolve.entry, cache=cache, llm=llm,
+                    catalogs_dir=CATALOGS_DIR,
+                    proposed_dir=PROPOSED_DIR,
+                    reports_dir=REPORTS_DIR,
+                    report=report,
+                )
+                st.session_state.last_run = {
+                    "slug": resolve.entry.slug,
+                    "resolved_via": resolve.resolved_via,
+                    "report": report,
+                    "n_found": r.n_found,
+                    "n_fields": r.n_fields,
+                    "catalog_path": str(r.catalog_path),
+                    "proposed_path": str(r.proposed_path),
+                    "report_path":  str(r.report_path),
+                }
+            except Exception as e:  # noqa: BLE001
+                import traceback
+                st.session_state.last_error = (
+                    f"Pipeline failed: {e}\n\n"
+                    f"```\n{traceback.format_exc()}\n```"
+                )
 
 # ---------------------------------------------------------------------------
 # Result display
 # ---------------------------------------------------------------------------
 if st.session_state.last_error:
     st.error(st.session_state.last_error)
+
+# ----- Flow-configured routing -----
+fc = st.session_state.get("flow_configured")
+if fc:
+    st.info(
+        f"**`{fc['slug']}` is a flow-configured platform.** The extraction "
+        f"pipeline (sub-project A) is not the right tool here — flow-configured "
+        f"platforms don't have a fixed schema you can crawl. Their ACD data "
+        f"footprint is emergent from admin configuration. Use the "
+        f"**Flow Blueprint** capability instead."
+    )
+    st.caption(fc["description"])
+
+    blueprint_paths = [Path(p) for p in fc["blueprint_paths"]]
+    if not blueprint_paths:
+        st.warning(
+            f"No blueprints found under `ontology/blueprints/{fc['slug']}/`. "
+            f"Author one following the framework at "
+            f"`docs/superpowers/specs/2026-08-09-flow-blueprint-design.md`."
+        )
+    else:
+        st.subheader(f"Available blueprints for {fc['name']}")
+        # One tab per blueprint — routing-model as the tab label
+        tabs = st.tabs([p.stem for p in blueprint_paths])
+        for tab, path in zip(tabs, blueprint_paths):
+            with tab:
+                content = path.read_text()
+                st.markdown(f"**Source:** `{path.relative_to(ROOT)}`")
+                # Split frontmatter from body so YAML doesn't render as prose
+                if content.startswith("---"):
+                    parts = content.split("---", 2)
+                    if len(parts) >= 3:
+                        with st.expander("YAML frontmatter", expanded=False):
+                            st.code(parts[1].strip(), language="yaml")
+                        body = parts[2].lstrip()
+                    else:
+                        body = content
+                else:
+                    body = content
+                st.markdown(body)
+                st.download_button(
+                    "⬇ Download blueprint",
+                    data=content,
+                    file_name=path.name,
+                    mime="text/markdown",
+                    key=f"dl_{path.stem}",
+                )
+    st.stop()
 
 last = st.session_state.last_run
 

@@ -1,0 +1,32 @@
+slug: salesforce
+name: "Salesforce Service Cloud"
+aliases:
+  - "Salesforce"
+  - "SFDC"
+  - "Service Cloud"
+  - "Salesforce Omni-Channel"
+  - "Service Cloud Voice"
+category: flow_configured
+description: >
+  Salesforce Service Cloud is a flow-configured CRM/CCaaS platform. Unlike
+  fixed-schema ACDs (Avaya CMS, Genesys Cloud), the ACD data footprint on
+  Salesforce is EMERGENT from configured flows — which objects hold which
+  data depends on how the customer's admin has set up Omni-Channel routing,
+  Presence Configurations, and Service Channels.
+  .
+  For Salesforce, do NOT run the schema-extraction pipeline (sub-project A).
+  Instead, use the Flow Blueprint capability (sub-project B2) which
+  documents what the admin must configure. See:
+  .
+    ontology/blueprints/salesforce/queue_based.md
+  .
+  Additional blueprints (skill_based, presence_aware, overflow_escalation)
+  can be authored following the same framework.
+
+# sources: empty for flow_configured platforms — the "source" IS the
+# blueprint document, not a fetch URL.
+sources: []
+
+version:
+  system_version: "Spring '26"
+  last_verified: "2026-08-09"
