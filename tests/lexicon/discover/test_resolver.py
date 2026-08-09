@@ -139,3 +139,35 @@ def test_search_fallback_rejects_unsafe_slug(tmp_path):
     from lexicon.discover.resolver import ResolveError
     with pytest.raises(ResolveError, match="unsafe slug"):
         resolve_vendor_with_fallback("Evil", registry=[], llm=llm)
+
+
+def test_search_prompt_accepts_community_sites():
+    """The prompt must not restrict URLs to `docs.*/developer.*` — community sites
+    (community.*, success.*, support.*, trailhead.*, kb.*) hold real integration
+    docs for many vendors (Five9 WSDL articles, Salesforce Trailhead, etc.)."""
+    from lexicon.discover.resolver import SEARCH_PROMPT_TEMPLATE
+    prompt = SEARCH_PROMPT_TEMPLATE.format(vendor="TestVendor")
+    for domain_pattern in ("community.", "support."):
+        assert domain_pattern in prompt, (
+            f"Search prompt must mention '{domain_pattern}' as a valid source domain"
+        )
+
+
+def test_search_fallback_accepts_community_url_from_llm(tmp_path):
+    """End-to-end: if the LLM returns a community URL, it is accepted as a valid source."""
+    cache = DiskCache(tmp_path / "cache")
+
+    def fake_llm(model, prompt):
+        return (
+            "slug: five9_test\n"
+            "name: Five9\n"
+            "sources:\n"
+            "  - kind: html_doc\n"
+            "    role: primary\n"
+            "    url: https://community.five9.com/s/article/API-WSDL-file-used-by-Five9\n"
+        )
+
+    llm = LLMClient(cache=cache, offline=False, _call_impl=fake_llm)
+    r = resolve_vendor_with_fallback("Five9", registry=[], llm=llm)
+    assert r.entry.slug == "five9_test"
+    assert r.entry.sources[0].url.startswith("https://community.five9.com")

@@ -74,12 +74,22 @@ Return a YAML document with these fields:
   sources:
     - kind: html_doc
       role: primary
-      url: <URL of the vendor's primary developer/admin documentation site>
+      url: <best URL for the vendor's primary developer/admin documentation>
+    - kind: html_doc
+      role: secondary
+      url: <optional additional URL — community/support article, WSDL landing page, etc.>
 
 Rules:
-- Include only URLs on the vendor's own official domain (docs.*, developer.*, help.*, admin.*).
+- Include URLs on the vendor's own domains only. Authoritative sources may live at:
+  * docs.*, developer.*, api.*, help.*, admin.* — official documentation
+  * community.*, success.*, trailhead.* — vendor community sites (often hold API/WSDL
+    references and integration notes that official docs miss; treat them as valid sources)
+  * support.*, kb.* — support knowledge bases with integration articles
 - Prefer pages that document data models, historical reporting fields, or API schemas.
-- If unsure, include a best-guess URL and let the human verify.
+- If the same information appears on both official docs and a community article, prefer
+  the official one — but a community URL is a valid primary source when official docs
+  don't cover the topic (common for integration/WSDL/webhook references).
+- If unsure, include a best-guess URL as primary + one alternate as secondary.
 - Return YAML ONLY — no prose, no code fences.
 """
 
