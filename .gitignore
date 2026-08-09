@@ -13,3 +13,10 @@ state/*
 # Integrity Layer per-run outputs
 out/*
 !out/.gitkeep
+
+# Discovery runtime state
+state/discovery_cache/
+fixtures/vendor_schemas/*
+!fixtures/vendor_schemas/.gitkeep
+out/discovery_reports/*
+!out/discovery_reports/.gitkeep
