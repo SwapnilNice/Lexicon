@@ -1,0 +1,25 @@
+slug: genesys_cloud
+name: "Genesys Cloud"
+aliases:
+  - "Genesys"
+  - "Genesys Cloud CX"
+  - "PureCloud"
+category: fixed_schema
+description: >
+  Cloud contact-center platform. Historical interval metrics are exposed
+  via the Analytics API (Conversation aggregates).
+
+sources:
+  - kind: html_doc
+    role: primary
+    url: https://developer.genesys.cloud/analyticsdatamanagement/analytics/detail/aggregations
+    crawl:
+      max_depth: 2
+      max_pages: 30
+  - kind: openapi
+    role: primary
+    url: https://api.mypurecloud.com/api/v2/docs/swagger.json
+
+version:
+  system_version: "2025.10"
+  last_verified: "2026-08-09"
