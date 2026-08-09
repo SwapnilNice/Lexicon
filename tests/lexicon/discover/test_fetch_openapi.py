@@ -56,3 +56,33 @@ def test_schema_content_contains_properties(tmp_path):
 def test_missing_url_returns_empty(tmp_path):
     src = RegistrySource(kind="openapi", role="primary", url=None)
     assert fetch_openapi_source(src, cache=DiskCache(tmp_path)) == []
+
+
+def test_circular_refs_do_not_crash(tmp_path):
+    circular = {
+        "openapi": "3.0.0",
+        "components": {"schemas": {
+            "A": {"type": "object", "properties": {"b": {"$ref": "#/components/schemas/B"}}},
+            "B": {"type": "object", "properties": {"a": {"$ref": "#/components/schemas/A"}}},
+        }},
+    }
+    cache = DiskCache(tmp_path)
+    cache.put("http", "https://x/openapi.json", json.dumps(circular).encode())
+    src = RegistrySource(kind="openapi", role="primary", url="https://x/openapi.json")
+    # Should not raise RecursionError
+    docs = fetch_openapi_source(src, cache=cache)
+    assert len(docs) == 2  # A and B both emitted
+
+
+def test_bad_ref_does_not_crash(tmp_path):
+    spec = {
+        "openapi": "3.0.0",
+        "components": {"schemas": {
+            "X": {"type": "object", "properties": {"y": {"$ref": "#/components/schemas/Missing"}}},
+        }},
+    }
+    cache = DiskCache(tmp_path)
+    cache.put("http", "https://x/openapi.json", json.dumps(spec).encode())
+    src = RegistrySource(kind="openapi", role="primary", url="https://x/openapi.json")
+    docs = fetch_openapi_source(src, cache=cache)  # should not raise
+    assert len(docs) == 1

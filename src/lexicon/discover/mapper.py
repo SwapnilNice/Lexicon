@@ -151,6 +151,11 @@ def _propose_composed(
             rationale=f"missing components: {missing}",
             needs_review=True,
         )
+    if not weights:
+        return ProposedField(
+            formula=None, confidence=0.0,
+            rationale="no components matched", needs_review=True,
+        )
     formula = d["formula"].format(**placeholders)
     has_structural = all(w > 0.0 for w in weights)
     conf = _cap_confidence(min(weights), has_structural=has_structural)

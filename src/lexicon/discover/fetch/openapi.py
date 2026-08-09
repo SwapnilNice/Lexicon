@@ -24,17 +24,25 @@ def _default_fetcher(url: str) -> bytes:
     return r.content
 
 
-def _resolve_refs(node, root):
+def _resolve_refs(node, root, _depth=0, _visiting=None):
+    if _visiting is None:
+        _visiting = set()
     if isinstance(node, dict):
         if "$ref" in node and node["$ref"].startswith("#/"):
-            parts = node["$ref"][2:].split("/")
+            ref = node["$ref"]
+            if ref in _visiting or _depth > 20:
+                return {}  # break cycle; caller sees empty schema
+            parts = ref[2:].split("/")
             target = root
-            for p in parts:
-                target = target[p]
-            return _resolve_refs(copy.deepcopy(target), root)
-        return {k: _resolve_refs(v, root) for k, v in node.items()}
+            try:
+                for p in parts:
+                    target = target[p]
+            except (KeyError, TypeError):
+                return {}  # bad ref — emit empty rather than crash
+            return _resolve_refs(copy.deepcopy(target), root, _depth + 1, _visiting | {ref})
+        return {k: _resolve_refs(v, root, _depth, _visiting) for k, v in node.items()}
     if isinstance(node, list):
-        return [_resolve_refs(x, root) for x in node]
+        return [_resolve_refs(x, root, _depth, _visiting) for x in node]
     return node
 
 

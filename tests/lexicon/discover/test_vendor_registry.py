@@ -57,3 +57,16 @@ def test_bad_category_raises(tmp_path):
 
 def test_empty_dir_returns_empty_list(tmp_path):
     assert load_registry(tmp_path) == []
+
+
+def test_unsafe_slug_in_registry_file_raises(tmp_path):
+    _write(tmp_path / "bad.yaml", """
+        slug: ../evil
+        name: "Evil"
+        aliases: []
+        category: fixed_schema
+        description: d
+        sources: []
+    """)
+    with pytest.raises(RegistryError, match="unsafe slug"):
+        load_registry(tmp_path)

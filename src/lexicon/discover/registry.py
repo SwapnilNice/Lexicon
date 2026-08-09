@@ -6,6 +6,7 @@ from pathlib import Path
 import yaml
 
 from .models import RegistrySource, VendorRegistryEntry
+from .validation import validate_slug
 
 VALID_CATEGORIES = {"fixed_schema", "flow_configured"}
 VALID_SOURCE_KINDS = {"html_doc", "openapi", "graphql", "wsdl"}
@@ -20,6 +21,10 @@ def _load_one(path: Path) -> VendorRegistryEntry:
     for req in ("slug", "name", "category", "description", "sources"):
         if req not in raw:
             raise RegistryError(f"{path.name}: missing required key {req!r}")
+    try:
+        validate_slug(raw["slug"], f"{path.name}")
+    except ValueError as exc:
+        raise RegistryError(str(exc)) from exc
     if raw["category"] not in VALID_CATEGORIES:
         raise RegistryError(
             f"{path.name}: category={raw['category']!r} not in {sorted(VALID_CATEGORIES)}"

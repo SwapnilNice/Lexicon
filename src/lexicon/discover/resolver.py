@@ -11,7 +11,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from .models import VendorRegistryEntry
+import yaml
+
+from .llm import LLMClient
+from .models import RegistrySource, VendorRegistryEntry
+from .validation import validate_slug
 
 
 ResolveVia = Literal["slug", "name", "alias", "search"]
@@ -59,11 +63,6 @@ def resolve_vendor(query: str, entries: list[VendorRegistryEntry]) -> ResolveRes
 # Task 8 – search fallback for unknown vendors
 # ---------------------------------------------------------------------------
 
-import yaml
-
-from .llm import LLMClient
-from .models import RegistrySource, VendorRegistryEntry
-
 
 SEARCH_PROMPT_TEMPLATE = """You are helping locate authoritative documentation for an ACD/contact-center system.
 
@@ -104,6 +103,10 @@ def resolve_vendor_with_fallback(
         raise ResolveError(
             f"search fallback for '{query}' returned invalid YAML: {text[:200]!r}"
         )
+    try:
+        validate_slug(data["slug"], f"search fallback for '{query}'")
+    except ValueError as exc:
+        raise ResolveError(str(exc)) from exc
     sources = [
         RegistrySource(
             kind=s.get("kind", "html_doc"),

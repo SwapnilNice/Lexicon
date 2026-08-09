@@ -120,3 +120,22 @@ def test_search_fallback_offline_raises_when_registry_misses(tmp_path):
     llm = LLMClient(cache=DiskCache(tmp_path / "cache"), offline=True)
     with pytest.raises(Exception, match="cache miss"):
         resolve_vendor_with_fallback("Unknown Vendor", registry=[], llm=llm)
+
+
+def test_search_fallback_rejects_unsafe_slug(tmp_path):
+    cache = DiskCache(tmp_path / "cache")
+
+    def fake_llm(model, prompt):
+        return (
+            "slug: ../evil\n"
+            "name: Evil\n"
+            "sources:\n"
+            "  - kind: html_doc\n"
+            "    role: primary\n"
+            "    url: https://x/y\n"
+        )
+
+    llm = LLMClient(cache=cache, offline=False, _call_impl=fake_llm)
+    from lexicon.discover.resolver import ResolveError
+    with pytest.raises(ResolveError, match="unsafe slug"):
+        resolve_vendor_with_fallback("Evil", registry=[], llm=llm)

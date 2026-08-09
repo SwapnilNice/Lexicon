@@ -7,7 +7,6 @@ Flags:
   --proposed-dir <dir>   ontology/proposed/
   --reports-dir <dir>    out/discovery_reports/
   --report queue|agentqueue|agentsystem
-  --refresh              force re-fetch (default: use cache)
   --offline              disallow cache writes; fail on cache miss (CI mode)
 """
 from __future__ import annotations
@@ -42,7 +41,6 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--proposed-dir", default=str(DEFAULTS["proposed_dir"]))
     ap.add_argument("--reports-dir",  default=str(DEFAULTS["reports_dir"]))
     ap.add_argument("--report", choices=["queue", "agentqueue", "agentsystem"], default="queue")
-    ap.add_argument("--refresh", action="store_true")
     ap.add_argument("--offline", action="store_true")
     return ap
 
