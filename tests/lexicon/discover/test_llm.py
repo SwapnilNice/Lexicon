@@ -42,3 +42,11 @@ def test_live_call_caches_result(tmp_path, monkeypatch):
     r2 = client.complete(model="claude-haiku-4-5-20251001", prompt="q")
     assert r1 == "live-answer" and r2 == "live-answer"
     assert len(calls) == 1     # second call served from cache
+
+
+def test_malformed_cache_entry_raises(tmp_path):
+    cache = DiskCache(tmp_path)
+    cache.put_json("llm", "claude-haiku-4-5-20251001||q", {"result": "bad"})  # missing 'text'
+    client = LLMClient(cache=cache, offline=True)
+    with pytest.raises(RuntimeError, match="malformed"):
+        client.complete(model="claude-haiku-4-5-20251001", prompt="q")

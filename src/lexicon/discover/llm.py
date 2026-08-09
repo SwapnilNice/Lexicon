@@ -25,7 +25,10 @@ class LLMClient:
         key = f"{model}||{prompt}"
         cached = self.cache.get_json("llm", key)
         if cached is not None:
-            return cached["text"]
+            text = cached.get("text")
+            if text is None:
+                raise RuntimeError(f"LLM cache entry malformed (missing 'text' field): key={key!r}")
+            return text
         if self.offline:
             raise RuntimeError(f"LLM cache miss in offline mode: model={model} prompt[:40]={prompt[:40]!r}")
         text = self._call_impl(model, prompt)
@@ -45,4 +48,9 @@ class LLMClient:
             max_tokens=4000,
             messages=[{"role": "user", "content": prompt}],
         )
-        return msg.content[0].text
+        text_blocks = [b for b in msg.content if getattr(b, "type", None) == "text"]
+        if not text_blocks:
+            raise RuntimeError(
+                f"LLM returned no text block (model={model}, stop_reason={getattr(msg, 'stop_reason', None)!r})"
+            )
+        return text_blocks[0].text
