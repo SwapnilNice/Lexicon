@@ -42,6 +42,11 @@ events:
     description: "The agent accepts the routed interaction."
     prerequisites: [interaction.routed]
     optional: false
+    # Time between interaction.received and interaction.accepted is queue delay
+    # (excluding IVR). B4 mapper uses this hook to derive QueueDelayTime as
+    # (accepted timestamp - received timestamp).
+    projects_to_canonical_wfm: queue_delay_time
+    wfm_pair_with: interaction.received      # for queue_delay: received=start, accepted=end
 
   interaction.declined:
     description: "The agent explicitly declines the routed interaction."
@@ -113,6 +118,10 @@ events:
     description: "Agent begins a work session."
     prerequisites: []
     optional: false
+    # Time from login → logout is total session time (agent_system.LoginTime).
+    projects_to_canonical_wfm: login_time
+    wfm_pair_with: agent.logout             # login=start, logout=end (delta = LoginTime)
+    wfm_pair_as: start                      # THIS event is the start of the delta
 
   agent.logout:
     description: "Agent ends the work session."
@@ -123,6 +132,12 @@ events:
     description: "Agent transitions between presence states."
     prerequisites: [agent.login]
     optional: false
+    # Presence transitions project into the agent_system section fields:
+    # summed durations spent in the ready/not_ready presence states become
+    # ReadyTime / NotReadyTime. Requires the customer's integration to
+    # bucket UserServicePresence rows by StatusOption and sum interval
+    # durations — not a simple timestamp delta.
+    projects_to_canonical_wfm: presence_time
     attributes:
       from_state:
         references: presence_states

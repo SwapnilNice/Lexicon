@@ -7,28 +7,35 @@ category: fixed_schema
 description: >
   Five9 Virtual Contact Center — cloud CCaaS. Historical statistics are
   exposed via the Statistics API (SOAP/WSDL) and the MASH reporting REST
-  API. Authoritative WSDL references live on the Five9 community site;
-  the developer portal is JS-rendered and largely gated behind login.
+  API. Documentation is hosted on Zoomin (documentation.five9.com) but
+  the actual PDF assets are served from documentation-be.five9.com.
 
 sources:
-  # Community article — publicly reachable, describes the WSDL location
-  # and how to consume the Statistics API. Not gated.
+  # Dashboard & Report Catalog — the primary reference for metric names,
+  # definitions, and formulas. Enumerates every metric available in the
+  # Five9 dashboards and reports UI.
   - kind: html_doc
     role: primary
-    url: https://community.five9.com/s/article/API-WSDL-file-used-by-Five9?language=en_US
+    url: https://documentation-be.five9.com/bundle/dashboard-report-catalog/raw/resource/enus/dashboard-report-catalog.pdf
     crawl:
-      max_depth: 1
-      max_pages: 5
+      max_depth: 0
+      max_pages: 1
 
-  # Vendor documentation portal (Zoomin-hosted). JS-rendered and mostly
-  # auth-gated, so v1's fetcher won't get much here — kept as a pointer
-  # for humans and for a future headless-browser fetcher (sub-project B1).
+  # Basic Administrator's Guide — reference for object model and permissions.
   - kind: html_doc
     role: secondary
-    url: https://documentation.five9.com/
+    url: https://documentation-be.five9.com/bundle/basic-administrators-guide/raw/resource/enus/basic-administrators-guide.pdf
     crawl:
-      max_depth: 1
-      max_pages: 5
+      max_depth: 0
+      max_pages: 1
+
+  # Administrator Console — additional context on skills, campaigns, dispositions.
+  - kind: html_doc
+    role: secondary
+    url: https://documentation-be.five9.com/bundle/administrator-console/raw/resource/enus/administrator-console.pdf
+    crawl:
+      max_depth: 0
+      max_pages: 1
 
 version:
   system_version: "current"

@@ -42,14 +42,24 @@ def _first_object_field(text: str) -> str | None:
     return m.group(1) if m else None
 
 
-def _load_events_projections(events_path: Path) -> dict[str, str]:
-    """Return {event_name: canonical_wfm_concept} for events that have a `projects_to_canonical_wfm` hook."""
+def _load_events_projections(events_path: Path) -> dict[str, dict]:
+    """Return {event_name: {concept, pair_with}} for events that project to a WFM concept.
+
+    `pair_with` is optional — if present, that's the event name to pair with
+    for a duration delta. If absent, the pipeline falls back to the naming
+    convention `<base>.start` ↔ `<base>.end`.
+    """
     raw = yaml.safe_load(events_path.read_text()) or {}
-    out: dict[str, str] = {}
+    out: dict[str, dict] = {}
     for name, spec in (raw.get("events") or {}).items():
         target = (spec or {}).get("projects_to_canonical_wfm")
-        if target:
-            out[name] = target
+        if not target:
+            continue
+        out[name] = {
+            "concept": target,
+            "pair_with": (spec or {}).get("wfm_pair_with"),
+            "pair_as": (spec or {}).get("wfm_pair_as"),   # "start" or "end" — role of THIS event
+        }
     return out
 
 
@@ -89,27 +99,48 @@ def derive_wfm_mapping(
     concept_rationale: dict[str, str] = {}
 
     for event_name, subsection in bp.event_subsections.items():
-        target_concept = projections.get(event_name)
-        if not target_concept:
+        proj = projections.get(event_name)
+        if not proj:
             continue
+        target_concept = proj["concept"]
         recorded_in = subsection.get("Recorded in", "")
-        start_ref = _first_object_field(recorded_in)
-        if start_ref is None:
+        this_ref = _first_object_field(recorded_in)
+        if this_ref is None:
             continue
-        # Find the paired ".end" event with the same target concept (or the same base name + ".end")
-        base = event_name.rsplit(".", 1)[0]                 # e.g. interaction.talk
-        end_name = f"{base}.end"
-        end_sub = bp.event_subsections.get(end_name, {})
-        end_ref = _first_object_field(end_sub.get("Recorded in", "")) if end_sub else None
-        if end_ref is None:
-            # No paired .end — record the start as the value alone (customer may aggregate).
-            concept_formulas[target_concept] = start_ref
+
+        # Determine the paired event. Priority:
+        #   1. explicit `wfm_pair_with` in the projection spec (e.g. queue_delay:
+        #      accepted pairs with received, not with an .end sibling)
+        #   2. naming convention: if this event ends in `.start`, pair with `.end`
+        pair_name = proj.get("pair_with")
+        if pair_name is None and event_name.endswith(".start"):
+            pair_name = event_name.rsplit(".", 1)[0] + ".end"
+
+        pair_sub = bp.event_subsections.get(pair_name or "", {})
+        pair_ref = _first_object_field(pair_sub.get("Recorded in", "")) if pair_sub else None
+
+        if pair_ref is None:
+            # No pair — record the single event's reference as the value.
+            concept_formulas[target_concept] = this_ref
             concept_provenance[target_concept] = [event_name]
-            concept_rationale[target_concept] = f"single-event value from `{event_name}` (no paired .end in blueprint)"
+            concept_rationale[target_concept] = (
+                f"single-event value from `{event_name}` (no paired event in blueprint)"
+            )
         else:
+            # Order the subtraction so end - start yields a positive duration.
+            # Explicit `wfm_pair_as` wins; otherwise fall back to naming convention:
+            #   .start suffix  → this event is start
+            #   otherwise      → this event is end (matches queue-delay accepted-vs-received)
+            pair_as = proj.get("pair_as")
+            if pair_as == "start" or (pair_as is None and event_name.endswith(".start")):
+                start_ref, end_ref = this_ref, pair_ref
+            else:
+                start_ref, end_ref = pair_ref, this_ref
             concept_formulas[target_concept] = f"{end_ref} - {start_ref}"
-            concept_provenance[target_concept] = [event_name, end_name]
-            concept_rationale[target_concept] = f"duration between `{event_name}` and `{end_name}` (in seconds)"
+            concept_provenance[target_concept] = [event_name, pair_name] if pair_name else [event_name]
+            concept_rationale[target_concept] = (
+                f"duration between `{event_name}` and `{pair_name}` (in seconds)"
+            )
 
     # Step 2: for each canonical WFM field with a derivation, compose from primitives.
     fields: dict[str, str | None] = {}
@@ -154,9 +185,16 @@ def derive_wfm_mapping(
     # QueueDelayTime = queue_delay_time). Only emit if they weren't already handled by a derivation
     # above (some canonical fields may be both leaf AND composed in the ontology).
     LEAF_TO_CONCEPT = {
+        # queue-report leaves
         "HoldTime": "hold_time",
         "WorkTime": "acw_time",
         "QueueDelayTime": "queue_delay_time",
+        # agent-report leaves (agent_queue + agent_system sections)
+        "LoginTime": "login_time",
+        # ReadyTime / NotReadyTime need presence-state aggregation, not a
+        # simple timestamp delta. The `presence_time` primitive holds the
+        # data source; deriving the split into ready vs not_ready requires
+        # customer-side aggregation the mapper flags in its rationale.
     }
     for canon_field, concept in LEAF_TO_CONCEPT.items():
         if canon_field in fields:

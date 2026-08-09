@@ -8,6 +8,7 @@ URL only (`max_depth: 0`). Multi-hop crawl is a follow-up enhancement
 from __future__ import annotations
 import hashlib
 import re
+from pathlib import Path
 from typing import Callable
 
 from bs4 import BeautifulSoup
@@ -50,6 +51,91 @@ def _looks_like_markdown(url: str, content: str) -> bool:
     return has_h2
 
 
+def _looks_like_pdf(url: str, body: bytes) -> bool:
+    """Is the raw body a PDF?"""
+    return url.lower().endswith(".pdf") or body[:5] == b"%PDF-"
+
+
+def _pdf_to_markdown(body: bytes) -> str:
+    """Extract text from a PDF and coerce it into a Markdown-ish shape.
+
+    Each page becomes a `## Page N` section. Lines that look like field
+    definitions (short capitalized identifier followed by longer prose)
+    get promoted to `## <identifier>` headings so the Markdown extractor
+    can pick them up.
+    """
+    import io
+    try:
+        import pypdf
+    except ImportError as e:
+        raise RuntimeError("pypdf not installed — required for PDF sources") from e
+
+    reader = pypdf.PdfReader(io.BytesIO(body))
+    parts: list[str] = []
+    parts.append(f"# {reader.metadata.title if reader.metadata and reader.metadata.title else 'PDF'}\n")
+
+    # Field-definition patterns — tried in order. Each captures (name, description).
+    # Order matters: more specific / more punctuation-anchored first.
+    patterns = [
+        # "Field Name: description" or "Field Name - description" or "Field Name – description" (en dash)
+        re.compile(r"^([A-Z][A-Za-z0-9 _./&-]{2,60})\s*[:\-–]\s+(.{20,})$"),
+        # "Field Name (subtype description) rest of description"  ← Five9 style
+        re.compile(r"^([A-Z][A-Za-z ]{2,50})\s*\(([^)]{3,60})\)\s+(.{20,})$"),
+        # "AVG_HANDLE_TIME  description" (SNAKE_CASE + gap + text)
+        re.compile(r"^([A-Z][A-Z0-9_]{4,50})\s{2,}(.{20,})$"),
+    ]
+    noise_prefixes = (
+        "Page ",                       # page numbers in headers
+        "Cloud Contact Center",        # vendor footer
+        "Dashboards and Reports",      # section header
+        "Administrator",               # section header
+    )
+
+    for i, page in enumerate(reader.pages, 1):
+        try:
+            text = page.extract_text() or ""
+        except Exception:  # noqa: BLE001
+            text = ""
+        if not text.strip():
+            continue
+
+        promoted_lines: list[str] = []
+        for line in text.splitlines():
+            stripped = line.strip()
+            if not stripped:
+                promoted_lines.append("")
+                continue
+
+            # Drop obvious page/section header noise
+            if any(stripped.startswith(p) for p in noise_prefixes):
+                continue
+            if len(stripped) < 5:      # single-digit page numbers, section markers
+                continue
+
+            matched = False
+            for pat in patterns:
+                m = pat.match(stripped)
+                if not m:
+                    continue
+                name = m.group(1).strip()
+                # Description is the LAST group (patterns[1] has a subtype in the middle).
+                description = m.group(m.lastindex).strip()
+                # Reject if the "name" looks like a run-on sentence
+                if len(name.split()) > 6:
+                    continue
+                promoted_lines.append(f"\n## {name}")
+                promoted_lines.append(description)
+                matched = True
+                break
+
+            if not matched:
+                promoted_lines.append(stripped)
+
+        parts.append("\n".join(promoted_lines))
+
+    return "\n".join(parts)
+
+
 def _markdown_title(md: str) -> str:
     """First `# Title` heading in the document, or empty string."""
     m = re.search(r"^#\s+(.+)$", md, re.MULTILINE)
@@ -74,6 +160,17 @@ def fetch_html_source(
             )
         body = fetcher(source.url)
         cache.put("http", source.url, body)
+    # PDF path — extract text, promote likely field headings, emit as markdown.
+    if _looks_like_pdf(source.url, body):
+        md_content = _pdf_to_markdown(body)
+        doc_id = f"pdf:{hashlib.sha256(source.url.encode()).hexdigest()[:12]}"
+        return [SourceDoc(
+            id=doc_id, kind="markdown", url=source.url,
+            title=_markdown_title(md_content) or Path(source.url).stem,
+            content=md_content,
+            text="",
+        )]
+
     content = body.decode("utf-8", errors="ignore")
 
     if _looks_like_markdown(source.url, content):

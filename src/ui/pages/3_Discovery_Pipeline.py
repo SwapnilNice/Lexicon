@@ -258,7 +258,7 @@ if fc:
                         blueprint_path=path,
                         events_path=BLUEPRINTS_DIR / "events.yaml",
                         canonical_path=ROOT / "ontology" / "canonical_wfm.yaml",
-                        report="queue",
+                        report=report,   # honor sidebar report choice
                     )
                 except Exception as e:  # noqa: BLE001
                     st.error(f"Failed to derive WFM mapping: {e}")

@@ -84,7 +84,7 @@ Salesforce Omni-Channel with **queue-based routing**: interactions (Cases, Chat 
 # ACD event mapping
 
 ### interaction.received
-- **Recorded in:** `PendingServiceRouting` (row is created)
+- **Recorded in:** `PendingServiceRouting.CreatedDate` (row is created; CreatedDate is the arrival timestamp)
 - **Trigger:** A routable object (Case, MessagingSession, VoiceCall, Chat_Transcript) is submitted to a Queue that has an Omni-Channel Routing Configuration bound.
 - **Prerequisite events:** none
 - **Caveats:** PSR rows are transient — deleted once routed. See Known traps.
@@ -156,13 +156,13 @@ Salesforce Omni-Channel with **queue-based routing**: interactions (Cases, Chat 
 - **Caveats:** Auto-close may fire the Closed status without the agent explicitly clicking Close.
 
 ### agent.login
-- **Recorded in:** `UserServicePresence` (new row created with a StatusId whose StatusOption is not Offline)
+- **Recorded in:** `UserServicePresence.StatusStartDate` (new row is created with a non-Offline StatusId; StatusStartDate is the login timestamp)
 - **Trigger:** Agent sets a non-Offline presence status via the Omni-Channel widget.
 - **Prerequisite events:** none
 - **Caveats:** Presence isn't the same as Salesforce user login — a user can be logged into Salesforce but Offline in Omni-Channel. Discovery must use UserServicePresence, not User.LastLoginDate.
 
 ### agent.logout
-- **Recorded in:** `UserServicePresence` (new row with an Offline-category StatusId, or the previous row's EndDate)
+- **Recorded in:** `UserServicePresence.StatusEndDate` (previous row's StatusEndDate is populated, or a new Offline-category row is inserted)
 - **Trigger:** Agent sets Offline presence, closes the browser, or session ends.
 - **Prerequisite events:** agent.login
 - **Caveats:** Browser close doesn't always emit a clean logout; UserServicePresence may show an open "Online" row indefinitely. Discovery should treat any UserServicePresence older than 24h with no EndDate as effectively logged out.
