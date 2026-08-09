@@ -53,3 +53,72 @@ def resolve_vendor(query: str, entries: list[VendorRegistryEntry]) -> ResolveRes
         )
 
     raise ResolveError(f"no match for '{query}' in registry")
+
+
+# ---------------------------------------------------------------------------
+# Task 8 – search fallback for unknown vendors
+# ---------------------------------------------------------------------------
+
+import yaml
+
+from .llm import LLMClient
+from .models import RegistrySource, VendorRegistryEntry
+
+
+SEARCH_PROMPT_TEMPLATE = """You are helping locate authoritative documentation for an ACD/contact-center system.
+
+The ACD system is: "{vendor}"
+
+Return a YAML document with these fields:
+  slug: <lower_snake_case identifier for this vendor>
+  name: <human-readable name>
+  sources:
+    - kind: html_doc
+      role: primary
+      url: <URL of the vendor's primary developer/admin documentation site>
+
+Rules:
+- Include only URLs on the vendor's own official domain (docs.*, developer.*, help.*, admin.*).
+- Prefer pages that document data models, historical reporting fields, or API schemas.
+- If unsure, include a best-guess URL and let the human verify.
+- Return YAML ONLY — no prose, no code fences.
+"""
+
+
+def resolve_vendor_with_fallback(
+    query: str,
+    registry: list[VendorRegistryEntry],
+    llm: LLMClient,
+) -> ResolveResult:
+    try:
+        return resolve_vendor(query, registry)
+    except ResolveError as e:
+        if "no match" not in str(e):
+            raise  # ambiguity is not a search-fallback situation
+    text = llm.complete(
+        model="claude-sonnet-4-6",
+        prompt=SEARCH_PROMPT_TEMPLATE.format(vendor=query),
+    )
+    data = yaml.safe_load(text) or {}
+    if "slug" not in data or "sources" not in data:
+        raise ResolveError(
+            f"search fallback for '{query}' returned invalid YAML: {text[:200]!r}"
+        )
+    sources = [
+        RegistrySource(
+            kind=s.get("kind", "html_doc"),
+            role=s.get("role", "primary"),
+            url=s.get("url"),
+            crawl=s.get("crawl", {}),
+        )
+        for s in data["sources"]
+    ]
+    entry = VendorRegistryEntry(
+        slug=data["slug"],
+        name=data.get("name", query),
+        aliases=data.get("aliases", []),
+        category="fixed_schema",
+        description=f"Discovered via search fallback for query '{query}'.",
+        sources=sources,
+    )
+    return ResolveResult(entry=entry, resolved_via="search")
