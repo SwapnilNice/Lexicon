@@ -83,4 +83,83 @@ def validate(bp: ParsedBlueprint, schema: SchemaDef, events: EventTaxonomy) -> l
                 f"last_verified={lv} is more than 6 months old — consider re-verifying",
             ))
 
+    # --- 6. Required sections present, in order (no order check for v1 — just presence) ---
+    section_names = [h for h, _ in bp.sections]
+    for req in schema.required_sections:
+        if req not in section_names:
+            errors.append(_err(bp.path, req, f"missing required section {req!r}"))
+
+    # --- 7. produces_events ↔ event subsections one-to-one ---
+    declared = set(fm.get("produces_events") or [])
+    found = set(bp.event_subsections.keys())
+    for missing_ev in declared - found:
+        errors.append(_err(
+            bp.path, "ACD event mapping",
+            f"produces_events lists {missing_ev!r} but no ### {missing_ev} subsection found",
+        ))
+    for orphan_ev in found - declared:
+        errors.append(_err(
+            bp.path, f"### {orphan_ev}",
+            f"orphan event subsection {orphan_ev!r}: not declared in produces_events",
+        ))
+
+    # --- 8. Each event subsection has required micro-fields ---
+    required_fields = {f for f in schema.event_subsection_fields if f != "Caveats"}
+    for ev, fields in bp.event_subsections.items():
+        for req in required_fields:
+            if req not in fields:
+                errors.append(_err(
+                    bp.path, f"### {ev}",
+                    f"missing required micro-field {req!r} in event subsection {ev!r}",
+                ))
+        if "Caveats" not in fields:
+            errors.append(_warn(
+                bp.path, f"### {ev}",
+                f"missing optional micro-field 'Caveats' in event subsection {ev!r}",
+            ))
+
+    # --- 9. Object footprint table ---
+    footprint_body = dict(bp.sections).get("Object footprint", "")
+    if footprint_body.strip():
+        errors.extend(_validate_object_footprint(bp.path, footprint_body, schema))
+
+    return errors
+
+
+def _validate_object_footprint(path: Path, body: str, schema: SchemaDef) -> list[ValidationError]:
+    """Validate the Object footprint Markdown table's columns and Concept column values."""
+    errors: list[ValidationError] = []
+    lines = [line for line in body.splitlines() if line.strip().startswith("|")]
+    if len(lines) < 2:
+        errors.append(_err(path, "Object footprint", "no Markdown table found"))
+        return errors
+
+    def cells(line: str) -> list[str]:
+        parts = [c.strip() for c in line.strip().strip("|").split("|")]
+        return parts
+
+    header_cells = cells(lines[0])
+    if header_cells != schema.object_footprint_columns:
+        errors.append(_err(
+            path, "Object footprint",
+            f"columns {header_cells} do not match schema {schema.object_footprint_columns}",
+        ))
+        return errors
+
+    # Data rows start after the separator line (lines[1]).
+    for i, row in enumerate(lines[2:], start=1):
+        row_cells = cells(row)
+        if len(row_cells) != len(schema.object_footprint_columns):
+            errors.append(_err(
+                path, "Object footprint",
+                f"row {i}: has {len(row_cells)} cells, expected {len(schema.object_footprint_columns)}",
+            ))
+            continue
+        concept = row_cells[0]
+        if concept not in schema.concept_vocabulary:
+            errors.append(_err(
+                path, "Object footprint",
+                f"row {i}: concept {concept!r} not in concept_vocabulary "
+                f"({sorted(schema.concept_vocabulary)})",
+            ))
     return errors
