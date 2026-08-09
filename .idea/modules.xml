@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Lexicon_Avaya_Starter.iml" filepath="$PROJECT_DIR$/Lexicon_Avaya_Starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Lexicon.iml" filepath="$PROJECT_DIR$/Lexicon.iml" />
     </modules>
   </component>
 </project>
