@@ -8,12 +8,28 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 
+# ---------------------------------------------------------------------------
+# Source-kind vocabulary.
+#
+# There are TWO Literal aliases for source types, describing different levels
+# of the pipeline. They map one-to-one but use different identifiers on
+# purpose:
+#
+#   Fetcher input (RegistrySource.kind)   Extractor input (SourceDoc.kind)
+#   ---------------------------------     ------------------------------
+#   html_doc  (a documentation site)  →   html            (a fetched HTML page)
+#   openapi   (an OpenAPI spec URL)   →   openapi_schema  (one schema object)
+#   graphql   (a GraphQL endpoint)    →   graphql_type    (one named type)
+#   wsdl      (a WSDL URL)            →   wsdl_type       (one named type)
+#
+# Fetch strategies own this translation. Extractors dispatch on SourceDoc.kind.
+# ---------------------------------------------------------------------------
 SourceKind = Literal[
     "html", "openapi_schema", "graphql_type", "wsdl_type",
 ]
 
 
-@dataclass
+@dataclass(frozen=True)
 class FieldSource:
     """Where in the world a field mention was found."""
     doc_id: str
@@ -22,7 +38,7 @@ class FieldSource:
     snippet: str        # short excerpt of the source content
 
 
-@dataclass
+@dataclass(frozen=True)
 class SourceDoc:
     """One normalized source document. The uniform seam between fetch and extract."""
     id: str
@@ -33,7 +49,7 @@ class SourceDoc:
     text: str = ""      # cleaned plain text (HTML only); empty for schema docs
 
 
-@dataclass
+@dataclass(frozen=True)
 class RawField:
     """A single vendor field mention extracted from one source."""
     name: str
@@ -43,14 +59,14 @@ class RawField:
     confidence_extraction: float
 
 
-@dataclass
+@dataclass(frozen=True)
 class SemanticTag:
     tag: str            # e.g. talk_time_like, hold_time_like, ready_time_like
     weight: float
     rationale: str = ""
 
 
-@dataclass
+@dataclass(frozen=True)
 class Trap:
     kind: Literal["exclusion", "inclusion", "unit_slip"]
     target: str = ""    # e.g. hold_time
@@ -80,7 +96,7 @@ class ProposedField:
     needs_review: bool = False
 
 
-@dataclass
+@dataclass(frozen=True)
 class RegistrySource:
     kind: Literal["html_doc", "openapi", "graphql", "wsdl"]
     role: Literal["primary", "secondary"]
