@@ -13,3 +13,13 @@ state/*
 # Integrity Layer per-run outputs
 out/*
 !out/.gitkeep
+
+# Discovery runtime state
+state/discovery_cache/
+fixtures/vendor_schemas/*
+!fixtures/vendor_schemas/.gitkeep
+# NOTE: the bare `out/` on line 1 already blanket-ignores this directory;
+#       the two lines below are informational only. Use `git add -f` for
+#       .gitkeep markers under out/*/.
+out/discovery_reports/*
+!out/discovery_reports/.gitkeep

@@ -307,13 +307,53 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("catalog")
     ap.add_argument("--vendor", required=True)
-    ap.add_argument("--engine", choices=["heuristic", "reference", "llm"], default="reference")
+    ap.add_argument("--engine", choices=["heuristic", "reference", "llm", "lexicon"], default="reference")
     ap.add_argument("--report", choices=["queue", "agentqueue", "agentsystem"], default="queue")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
     catalog = yaml.safe_load(pathlib.Path(args.catalog).read_text())
-    if args.engine == "llm":
+    if args.engine == "lexicon":
+        from lexicon.discover.enrich.semantic_tag import tag_fields
+        from lexicon.discover.enrich.trap_detect import detect_traps
+        from lexicon.discover.enrich.unit_infer import infer_units
+        from lexicon.discover.mapper import propose_mapping
+        from lexicon.discover.models import EnrichedField, FieldSource, SemanticTag, Trap
+        cat_fields = catalog.get("fields", {})
+        enriched: list[EnrichedField] = []
+        for name, spec in cat_fields.items():
+            if isinstance(spec, str):        # legacy discover catalog: name -> description
+                spec = {"description": spec}
+            enriched.append(EnrichedField(
+                name=name,
+                description=spec.get("description", ""),
+                sources=[FieldSource(doc_id="catalog", url="", locator="", snippet="")],
+                unit=spec.get("unit", "unknown"),
+                unit_confidence=float(spec.get("unit_confidence", 0.0)),
+                semantic_tags=[SemanticTag(tag=t["tag"], weight=float(t.get("weight", 0.0)))
+                               for t in (spec.get("semantic_tags") or [])],
+                traps=[Trap(kind=t.get("kind", ""), target=t.get("target", ""),
+                            evidence=t.get("evidence", ""))
+                       for t in (spec.get("traps") or [])],
+            ))
+        # Rich catalog: use provided enrichment as-is.
+        # Legacy catalog (only descriptions): populate enrichment now.
+        if not any(e.unit != "unknown" for e in enriched):
+            infer_units(enriched)
+            tag_fields(enriched)
+            detect_traps(enriched)
+        proposed = propose_mapping(enriched, report=args.report)
+        fields = {name: p.formula for name, p in proposed.items() if p.formula is not None}
+        proposals = {
+            name: {
+                "proposed": p.formula,
+                "confidence": p.confidence,
+                "rationale": p.rationale,
+                "needs_review": p.needs_review,
+            }
+            for name, p in proposed.items()
+        }
+    elif args.engine == "llm":
         fields, proposals = propose_llm(catalog, args.vendor, args.report)
     elif args.engine == "heuristic":
         fields, proposals = propose_heuristic(catalog, args.report)

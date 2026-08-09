@@ -244,6 +244,20 @@ discovered catalog.
 | a whole vendor documentation site | `--crawl <seed URL>` (new; recommended) |
 | already have a hand-made catalog | pass the `.yaml` directly to `add_vendor.sh` |
 
+### Step 0.5 — Try the fast path (registry-first discovery)
+
+If the vendor has a public documentation site or an OpenAPI schema, try:
+
+    python -m lexicon.discover <slug>
+
+This runs the full discover→propose pipeline from the vendor name alone,
+using `ontology/registry/<slug>.yaml`. For unknown vendors, Lexicon uses an
+LLM to propose candidate doc URLs (search fallback), which you can then commit
+to a new registry entry.
+
+Move on to Step 1 (the incremental discover/scaffold path below) only if you
+need PDF/CSV inputs the new pipeline doesn't yet support.
+
 ### Step 1 — Discover: build the field catalog
 
 Fastest path if you have a data export:

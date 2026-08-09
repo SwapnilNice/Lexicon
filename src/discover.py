@@ -276,6 +276,14 @@ def fields_from_text_llm(text: str, vendor: str) -> dict:
 
 
 def main():
+    # New-pipeline dispatcher: if the user passed *only* a vendor name (plus new-pipeline
+    # flags), delegate to lexicon.discover. Legacy flags (--from-csv/--doc/--crawl) fall
+    # through to the original code path below.
+    import sys as _sys
+    _legacy_flags = {"--from-csv", "--doc", "--crawl"}
+    if len(_sys.argv) >= 2 and not (_legacy_flags & set(_sys.argv)):
+        from lexicon.discover.cli import main as _new_main
+        raise SystemExit(_new_main(_sys.argv[1:]))
     ap = argparse.ArgumentParser()
     ap.add_argument("vendor")
     ap.add_argument("--from-csv", dest="csv", default=None)

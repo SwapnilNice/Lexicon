@@ -70,6 +70,25 @@ pytest -v
 python src/sensor.py out.xml
 ```
 
+### New in v1: one-shot vendor discovery
+
+Give Lexicon a vendor name and it produces a rich catalog + proposed mapping
+from public documentation only:
+
+    python -m lexicon.discover avaya_cms
+    python -m lexicon.discover "Avaya CMS"        # name resolution via registry
+
+The registry lives at `ontology/registry/<slug>.yaml`. Add a new vendor by
+copying one of the existing entries and pointing it at the vendor's official
+docs.
+
+Outputs:
+- `fixtures/vendor_catalogs/<slug>.yaml`        — rich field catalog
+- `ontology/proposed/<slug>.<report>.PROPOSED.yaml` — proposed mapping (consumed
+  by `verify_mapping.py` unchanged)
+- `out/discovery_reports/<slug>.md`             — coverage report (what worked,
+  what needs a human)
+
 ## Discover a new vendor's fields
 
 `discover.py` turns a vendor's documentation (or a real data export) into a

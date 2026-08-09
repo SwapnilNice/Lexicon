@@ -24,3 +24,11 @@ python src/sensor.py <your_output.xml>   # must report no drift
 
 Do not consider the task done until `pytest` passes and the sensor is clean.
 If a contract test fails, fix the mapping — do not weaken the test.
+
+When touching discovery code (`src/lexicon/discover/*`), the gate remains the
+same — `pytest -v` must be green. The two E2E regression tests
+`tests/lexicon/discover/test_e2e_avaya_cms.py` and
+`tests/lexicon/discover/test_e2e_genesys_cloud.py` are load-bearing:
+they encode the punchlines this project must deliver (Avaya HandleTime =
+acdtime + holdtime; Genesys ms→s + ACW-excluded HandleTime). Do NOT weaken
+these tests to make a change pass.

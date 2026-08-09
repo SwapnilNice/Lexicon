@@ -1,0 +1,25 @@
+slug: avaya_cms
+name: "Avaya CMS"
+aliases:
+  - "Avaya"
+  - "Avaya Call Management System"
+  - "CMS"
+  - "CMS Historical"
+category: fixed_schema
+description: >
+  Historical reporting database for Avaya Aura Contact Center. Interval
+  tables include hsplit (split/skill) and hagent (agent-per-split).
+
+sources:
+  - kind: html_doc
+    role: primary
+    url: https://documentation.avaya.com/en-us/home/bundle/cms/AvayaCMSDBItemsCalculations_r21/DatabaseInfoDatabaseTables/CMSDatabaseTableItems/DatabaseInfoSplitskillDatabaseItems.html
+    crawl:
+      max_depth: 2
+      max_pages: 30
+      include_paths:
+        - "/DatabaseInfoDatabaseTables/"
+
+version:
+  system_version: "R21"
+  last_verified: "2026-08-09"
