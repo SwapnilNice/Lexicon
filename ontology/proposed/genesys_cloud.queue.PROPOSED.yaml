@@ -1,0 +1,170 @@
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
+meta:
+  vendor: genesys_cloud
+  report: queue
+  status: proposed
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T18:41:17+00:00'
+fields:
+  QueueValue: queueId
+  AbandonedLong: abandoned
+  HandledShort: serviceLevel
+  HandledLong: communicationAnsweredEvents - serviceLevel
+  HandleTime: agentTalkDurationMilliseconds / 1000 + holdDurationsMilliseconds / 1000
+  HoldTime: holdDurationsMilliseconds / 1000
+  WorkTime: wrapupTimeoutMs / 1000
+  QueueDelayTime: waitBetweenNotificationMs / 1000
+  ContactsActive: activeParticipantCount
+proposals:
+  QueueValue:
+    proposed: queueId
+    confidence: 0.4
+    rationale: 'best queue_key_like match: queueId (weight=0.40)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: requestedRoutingSkillIds
+      confidence: 0.4
+      note: 'alternate queue_key_like match: requestedRoutingSkillIds'
+    - formula: activeSkillIds
+      confidence: 0.4
+      note: 'alternate queue_key_like match: activeSkillIds'
+    - formula: removedSkillIds
+      confidence: 0.4
+      note: 'alternate queue_key_like match: removedSkillIds'
+    - formula: skillExpressionId
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillExpressionId'
+    - formula: assignedSkillIds
+      confidence: 0.4
+      note: 'alternate queue_key_like match: assignedSkillIds'
+    - formula: skillGroups
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillGroups'
+    - formula: hasSplitFilters
+      confidence: 0.4
+      note: 'alternate queue_key_like match: hasSplitFilters'
+    - formula: hasSplitByMedia
+      confidence: 0.4
+      note: 'alternate queue_key_like match: hasSplitByMedia'
+    - formula: skills
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skills'
+    - formula: skillEvaluationMethod
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillEvaluationMethod'
+    - formula: skillUri
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillUri'
+    - formula: skillExpression
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillExpression'
+    - formula: routingSkillsIds
+      confidence: 0.4
+      note: 'alternate queue_key_like match: routingSkillsIds'
+    - formula: routingSkillExpression
+      confidence: 0.4
+      note: 'alternate queue_key_like match: routingSkillExpression'
+    - formula: skillColumns
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillColumns'
+    - formula: skillCombinations
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillCombinations'
+    - formula: skillCombination
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillCombination'
+    - formula: isLanguageSkill
+      confidence: 0.4
+      note: 'alternate queue_key_like match: isLanguageSkill'
+    - formula: skillConditions
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skillConditions'
+    - formula: routingSkillConditions
+      confidence: 0.4
+      note: 'alternate queue_key_like match: routingSkillConditions'
+    - formula: languageSkillConditions
+      confidence: 0.4
+      note: 'alternate queue_key_like match: languageSkillConditions'
+    - formula: languageSkill
+      confidence: 0.4
+      note: 'alternate queue_key_like match: languageSkill'
+    - formula: routingSkill
+      confidence: 0.4
+      note: 'alternate queue_key_like match: routingSkill'
+  AbandonedShort:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching abandoned_within_sl_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  AbandonedLong:
+    proposed: abandoned
+    confidence: 0.42
+    rationale: total-only fallback (abandoned); within-SL split missing
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandledShort:
+    proposed: serviceLevel
+    confidence: 0.56
+    rationale: 'best handled_within_sl_like match: serviceLevel (weight=0.56)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: acceptableIntervals
+      confidence: 0.56
+      note: 'alternate handled_within_sl_like match: acceptableIntervals'
+  HandledLong:
+    proposed: communicationAnsweredEvents - serviceLevel
+    confidence: 0.56
+    rationale: communicationAnsweredEvents - serviceLevel
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: emailCommunicationAnsweredEvents
+      confidence: 0.7
+      note: 'alternate total match: emailCommunicationAnsweredEvents'
+    - formula: acceptableIntervals
+      confidence: 0.56
+      note: 'alternate within-SL match: acceptableIntervals'
+  HandleTime:
+    proposed: agentTalkDurationMilliseconds / 1000 + holdDurationsMilliseconds / 1000
+    confidence: 0.68
+    rationale: composed from ['agentTalkDurationMilliseconds', 'holdDurationsMilliseconds']
+      per derivation
+    needs_review: false
+    needs_human: false
+    alternates: []
+  HoldTime:
+    proposed: holdDurationsMilliseconds / 1000
+    confidence: 0.68
+    rationale: 'best hold_time_like match: holdDurationsMilliseconds (weight=0.68)'
+    needs_review: false
+    needs_human: false
+    alternates: []
+  WorkTime:
+    proposed: wrapupTimeoutMs / 1000
+    confidence: 0.9
+    rationale: 'best acw_time_like match: wrapupTimeoutMs (weight=0.90)'
+    needs_review: false
+    needs_human: false
+    alternates: []
+  QueueDelayTime:
+    proposed: waitBetweenNotificationMs / 1000
+    confidence: 0.78
+    rationale: 'best queue_delay_time_like match: waitBetweenNotificationMs (weight=0.78)'
+    needs_review: false
+    needs_human: false
+    alternates:
+    - formula: delayMs / 1000
+      confidence: 0.78
+      note: 'alternate queue_delay_time_like match: delayMs'
+  ContactsActive:
+    proposed: activeParticipantCount
+    confidence: 0.78
+    rationale: 'best contacts_active_like match: activeParticipantCount (weight=0.78)'
+    needs_review: false
+    needs_human: false
+    alternates: []

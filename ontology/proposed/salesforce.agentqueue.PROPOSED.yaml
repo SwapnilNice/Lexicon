@@ -1,0 +1,51 @@
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
+meta:
+  vendor: salesforce
+  report: agentqueue
+  status: proposed
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T17:19:06+00:00'
+fields: {}
+proposals:
+  QueueValue:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching queue_key_like with unit=key
+    needs_review: true
+    needs_human: true
+    alternates: []
+  AgentValue:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching agent_key_like with unit=key
+    needs_review: true
+    needs_human: true
+    alternates: []
+  Handled:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching handled_total_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandleTime:
+    proposed: null
+    confidence: 0.0
+    rationale: 'missing components: [''talk_time_like'', ''hold_time_like'']'
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HoldTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching hold_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  WorkTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching acw_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []

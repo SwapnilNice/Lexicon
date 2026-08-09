@@ -1,0 +1,65 @@
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
+meta:
+  vendor: salesforce
+  report: agentsystem
+  status: proposed
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T17:19:08+00:00'
+fields: {}
+proposals:
+  AgentValue:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching agent_key_like with unit=key
+    needs_review: true
+    needs_human: true
+    alternates: []
+  InternalContacts:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching internal_count_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  InternalHandleTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching internal_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  ReadyTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching ready_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  NotReadyTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching not_ready_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  OutboundContacts:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching outbound_count_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  OutboundHandleTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching outbound_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  LoginTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching login_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []

@@ -1,0 +1,61 @@
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
+meta:
+  vendor: five9
+  report: agentqueue
+  status: proposed
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T18:37:28+00:00'
+fields:
+  QueueValue: Transfertimed-outinternalcallstoskillvoicemail
+  AgentValue: ShowAgentalldialattemptsascontactsessions
+proposals:
+  QueueValue:
+    proposed: Transfertimed-outinternalcallstoskillvoicemail
+    confidence: 0.3
+    rationale: 'best queue_key_like match: Transfertimed-outinternalcallstoskillvoicemail
+      (weight=0.30)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: Manageskillvoicemails
+      confidence: 0.3
+      note: 'alternate queue_key_like match: Manageskillvoicemails'
+  AgentValue:
+    proposed: ShowAgentalldialattemptsascontactsessions
+    confidence: 0.3
+    rationale: 'best agent_key_like match: ShowAgentalldialattemptsascontactsessions
+      (weight=0.30)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: Viewagentdata
+      confidence: 0.3
+      note: 'alternate agent_key_like match: Viewagentdata'
+  Handled:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching handled_total_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandleTime:
+    proposed: null
+    confidence: 0.0
+    rationale: 'missing components: [''talk_time_like'', ''hold_time_like'']'
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HoldTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching hold_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  WorkTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching acw_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []

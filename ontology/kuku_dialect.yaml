@@ -1,0 +1,329 @@
+# ==========================================================================
+# Lexicon — Kuku Dialect Map  (SCAFFOLD — needs author sign-off)
+# Generated from fixtures/vendor_catalogs/kuku.yaml
+# Media scope: immediate_response (fields not_applicable/ignored for this scope were skipped)
+#
+# Every field below is `confirmed: false`. Fill in `<vendor>:` lists and
+# `rule:` from the catalog, then flip `confirmed: true` once verified against
+# the vendor's own docs (not just the catalog description).
+# ==========================================================================
+
+meta:
+  vendor: "Kuku"
+  system: "TODO: describe the vendor system + version"
+  media_scope: immediate_response
+  source:
+    - name: "user-provided"
+      ref: "https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.html"
+
+# ------------------------------------------------------------------------
+# QUEUE -> canonical queue.*
+# ------------------------------------------------------------------------
+queue:
+  QueueValue:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  ContactsReceived:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  AbandonedShort:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  AbandonedLong:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  HandledShort:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  HandledLong:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  HandleTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    trap: ""                    # TRAP: talk+hold semantics — confirm vendor talk metric EXCLUDES hold before adding
+    confirmed: false
+  HoldTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  WorkTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    trap: ""                    # TRAP: ACW only — never merged into HandleTime
+    confirmed: false
+  QueueDelayTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    trap: ""                    # TRAP: must be wait-to-answer, not abandon-wait
+    confirmed: false
+  ContactsActive:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+
+# ------------------------------------------------------------------------
+# AGENT-QUEUE -> canonical agent_queue.*
+# ------------------------------------------------------------------------
+agent_queue:
+  QueueValue:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  AgentValue:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  Handled:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  HandleTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    trap: ""                    # TRAP: talk+hold semantics — confirm vendor talk metric EXCLUDES hold before adding
+    confirmed: false
+  HoldTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  WorkTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    trap: ""                    # TRAP: ACW only — never merged into HandleTime
+    confirmed: false
+
+# ------------------------------------------------------------------------
+# AGENT-SYSTEM -> canonical agent_system.*
+# ------------------------------------------------------------------------
+agent_system:
+  AgentValue:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  InternalContacts:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  InternalHandleTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  ReadyTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  NotReadyTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    trap: ""                    # TRAP: must EXCLUDE ACW; watch for per-split double-counting
+    confirmed: false
+  OutboundContacts:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  OutboundHandleTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+  LoginTime:
+    kuku: []            # TODO: vendor term(s)
+    rule: ""                    # TODO: how to compute from vendor term(s)
+    confirmed: false
+
+drift_watchlist:
+  forbidden_terms:
+    - "HandledTime"
+    - "Backlog"
+    - "AHT"
+    - "Utilization"
+  boundary_terms:    # auto-populated from catalog fields
+    - "ABANDONMENT_RATE"
+    - "ABANDON_TIME"
+    - "ACTIVE_AI_AGENTS"
+    - "AFTER_CONTACT_WORK_TIME"
+    - "AGENTS_AFTER_CONTACT_WORK"
+    - "AGENTS_AVAILABLE"
+    - "AGENTS_ERROR"
+    - "AGENTS_NON_PRODUCTIVE"
+    - "AGENTS_ONLINE"
+    - "AGENTS_ON_CONTACT"
+    - "AGENTS_STAFFED"
+    - "AGENT_ADHERENT_TIME"
+    - "AGENT_ANSWER_RATE"
+    - "AGENT_NON_ADHERENT_TIME"
+    - "AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS"
+    - "AGENT_SCHEDULED_TIME"
+    - "AGENT_SCHEDULE_ADHERENCE"
+    - "AI_AGENT_INVOCATIONS"
+    - "AI_AGENT_INVOCATION_SUCCESS"
+    - "AI_AGENT_INVOCATION_SUCCESS_RATE"
+    - "AI_AGENT_RESPONSE_HELPFUL"
+    - "AI_AGENT_RESPONSE_NOT_HELPFUL"
+    - "AI_HANDOFFS"
+    - "AI_HANDOFF_RATE"
+    - "AI_INVOLVED_CONTACTS"
+    - "AI_PROMPT_INVOCATIONS"
+    - "AI_PROMPT_INVOCATION_SUCCESS"
+    - "AI_PROMPT_INVOCATION_SUCCESS_RATE"
+    - "AI_RESPONSE_COMPLETION_RATE"
+    - "AI_TOOL_INVOCATIONS"
+    - "AI_TOOL_INVOCATION_SUCCESS"
+    - "AI_TOOL_INVOCATION_SUCCESS_RATE"
+    - "AI_TOOL_PARAMETER_ACCURACY"
+    - "AI_TOOL_SELECTION_ACCURACY"
+    - "AI_TOOL_UTILIZATION_ACCURACY"
+    - "API_CONTACTS_HANDLED"
+    - "AVG_ABANDON_TIME"
+    - "AVG_ACTIVE_TIME"
+    - "AVG_AFTER_CONTACT_WORK_TIME"
+    - "AVG_AGENT_CONCURRENCY"
+    - "AVG_AGENT_CONNECTING_TIME"
+    - "AVG_AGENT_PAUSE_TIME"
+    - "AVG_AI_AGENT_CONVERSATION_TURNS"
+    - "AVG_AI_CONVERSATION_TURNS"
+    - "AVG_AI_PROMPT_INVOCATION_LATENCY"
+    - "AVG_AI_TOOL_INVOCATION_LATENCY"
+    - "AVG_BOT_CONVERSATION_TIME"
+    - "AVG_BOT_CONVERSATION_TURNS"
+    - "AVG_CASE_RELATED_CONTACTS"
+    - "AVG_CASE_RESOLUTION_TIME"
+    - "AVG_CONTACT_DURATION"
+    - "AVG_CONTACT_FIRST_RESPONSE_TIME_AGENT"
+    - "AVG_CONVERSATION_CLOSE_TIME"
+    - "AVG_CONVERSATION_DURATION"
+    - "AVG_DIALS_PER_MINUTE"
+    - "AVG_EVALUATION_SCORE"
+    - "AVG_FIRST_RESPONSE_TIME_AGENT"
+    - "AVG_FLOW_TIME"
+    - "AVG_GREETING_TIME_AGENT"
+    - "AVG_HOLDS"
+    - "AVG_HOLD_TIME"
+    - "AVG_HOLD_TIME_ALL_CONTACTS"
+    - "AVG_INTERACTION_TIME"
+    - "AVG_INTERRUPTIONS_AGENT"
+    - "AVG_INTERRUPTION_TIME_AGENT"
+    - "AVG_MESSAGES"
+    - "AVG_MESSAGES_AGENT"
+    - "AVG_MESSAGES_BOT"
+    - "AVG_MESSAGES_CUSTOMER"
+    - "AVG_MESSAGE_LENGTH_AGENT"
+    - "AVG_MESSAGE_LENGTH_CUSTOMER"
+    - "AVG_NON_TALK_TIME"
+    - "AVG_QUEUE_ANSWER_TIME"
+    - "AVG_QUEUE_ANSWER_TIME_CUSTOMER_FIRST_CALLBACK"
+    - "AVG_RESPONSE_TIME_AGENT"
+    - "AVG_RESPONSE_TIME_CUSTOMER"
+    - "AVG_TALK_TIME"
+    - "AVG_TALK_TIME_AGENT"
+    - "AVG_TALK_TIME_CUSTOMER"
+    - "AVG_WAIT_TIME_AFTER_CUSTOMER_CONNECTION"
+    - "AVG_WAIT_TIME_AFTER_CUSTOMER_FIRST_CALLBACK_CONNECTION"
+    - "AVG_WEIGHTED_EVALUATION_SCORE"
+    - "BOT_CONVERSATIONS_COMPLETED"
+    - "BOT_INTENTS_COMPLETED"
+    - "CALLBACK_CONTACTS_HANDLED"
+    - "CAMPAIGN_CONTACTS_ABANDONED_AFTER_X"
+    - "CAMPAIGN_CONTACTS_ABANDONED_AFTER_X_RATE"
+    - "CAMPAIGN_INTERACTIONS"
+    - "CAMPAIGN_PROGRESS_RATE"
+    - "CAMPAIGN_SEND_ATTEMPTS"
+    - "CAMPAIGN_SEND_EXCLUSIONS"
+    - "CASES_CREATED"
+    - "COMPLETENESS_SCORE"
+    - "CONTACTS_ABANDONED"
+    - "CONTACTS_AGENT_HUNG_UP_FIRST"
+    - "CONTACTS_CONSULTED"
+    - "CONTACTS_CREATED"
+    - "CONTACTS_HANDLED"
+    - "CONTACTS_HANDLED_CONNECTED_TO_AGENT_TIME"
+    - "CONTACTS_HANDLED_INCOMING"
+    - "CONTACTS_HANDLED_OUTBOUND"
+    - "CONTACTS_HOLD_ABANDONS"
+    - "CONTACTS_IN_QUEUE"
+    - "CONTACTS_MISSED"
+    - "CONTACTS_ON_HOLD_AGENT_DISCONNECT"
+    - "CONTACTS_ON_HOLD_CUSTOMER_DISCONNECT"
+    - "CONTACTS_PUT_ON_HOLD"
+    - "CONTACTS_QUEUED"
+    - "CONTACTS_QUEUED_BY_ENQUEUE"
+    - "CONTACTS_REMOVED_FROM_QUEUE_IN_X"
+    - "CONTACTS_RESOLVED_IN_X"
+    - "CONTACTS_SCHEDULED"
+    - "CONTACTS_TRANSFERRED_IN"
+    - "CONTACTS_TRANSFERRED_IN_BY_AGENT"
+    - "CONTACTS_TRANSFERRED_IN_FROM_QUEUE"
+    - "CONTACTS_TRANSFERRED_OUT"
+    - "CONTACTS_TRANSFERRED_OUT_BY_AGENT"
+    - "CONTACTS_TRANSFERRED_OUT_EXTERNAL"
+    - "CONTACTS_TRANSFERRED_OUT_FROM_QUEUE"
+    - "CONTACTS_TRANSFERRED_OUT_INTERNAL"
+    - "CONVERSATIONS_ABANDONED"
+    - "CURRENT_CASES"
+    - "DELIVERY_ATTEMPTS"
+    - "DELIVERY_ATTEMPT_DISPOSITION_RATE"
+    - "ESTIMATED_WAIT_TIME"
+    - "EVALUATIONS_PERFORMED"
+    - "FAITHFULNESS_SCORE"
+    - "FLOWS_OUTCOME"
+    - "FLOWS_STARTED"
+    - "GOAL_SUCCESS_RATE"
+    - "HANDLE_TIME"
+    - "HUMAN_ANSWERED_CALLS"
+    - "INITIATION_METHOD"
+    - "INTERACTION_AND_HOLD_TIME"
+    - "INTERACTION_TIME"
+    - "KNOWLEDGE_CONTENT_REFERENCES"
+    - "MAX_FLOW_TIME"
+    - "MIN_FLOW_TIME"
+    - "OCCUPANCY"
+    - "OLDEST_CONTACT_AGE"
+    - "PERCENT_BOT_CONVERSATIONS_OUTCOME"
+    - "PERCENT_BOT_INTENTS_OUTCOME"
+    - "PERCENT_CASES_FIRST_CONTACT_RESOLVED"
+    - "PERCENT_CONTACTS_STEP_EXPIRED"
+    - "PERCENT_CONTACTS_STEP_JOINED"
+    - "PERCENT_FLOWS_OUTCOME"
+    - "PERCENT_NON_TALK_TIME"
+    - "PERCENT_TALK_TIME"
+    - "PERCENT_TALK_TIME_AGENT"
+    - "PERCENT_TALK_TIME_CUSTOMER"
+    - "POSITION_IN_QUEUE"
+    - "PROACTIVE_INTENTS_ANSWERED"
+    - "PROACTIVE_INTENTS_DETECTED"
+    - "PROACTIVE_INTENTS_ENGAGED"
+    - "PROACTIVE_INTENT_ENGAGEMENT_RATE"
+    - "PROACTIVE_INTENT_RESPONSE_RATE"
+    - "QUEUED_TIME"
+    - "QUEUE_ANSWER_TIME"
+    - "RECIPIENTS_ATTEMPTED"
+    - "RECIPIENTS_INTERACTED"
+    - "RECIPIENTS_TARGETED"
+    - "REOPENED_CASE_ACTIONS"
+    - "RESOLVED_CASE_ACTIONS"
+    - "SERVICE_LEVEL"
+    - "SLOTS_ACTIVE"
+    - "SLOTS_AVAILABLE"
+    - "STEP_CONTACTS_QUEUED"
+    - "SUM_CONNECTING_TIME_AGENT"
+    - "SUM_CONTACTS_ABANDONED_IN_X"
+    - "SUM_CONTACTS_ANSWERED_IN_X"
+    - "SUM_CONTACTS_DISCONNECTED"
+    - "SUM_CONTACT_FLOW_TIME"
+    - "SUM_CONTACT_TIME_AGENT"
+    - "SUM_ERROR_STATUS_TIME_AGENT"
+    - "SUM_HANDLE_TIME"
+    - "SUM_HOLD_TIME"
+    - "SUM_IDLE_TIME_AGENT"
+    - "SUM_INTERACTION_AND_HOLD_TIME"
+    - "SUM_INTERACTION_TIME"
+    - "SUM_NON_PRODUCTIVE_TIME_AGENT"
+    - "SUM_ONLINE_TIME_AGENT"
+    - "SUM_RETRY_CALLBACK_ATTEMPTS"
+  boundary_rule: "Kuku column names must NOT appear in canonical output or canonical-layer code."

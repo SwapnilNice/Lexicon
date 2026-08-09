@@ -1,74 +1,118 @@
-# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
-# have an expert review. AI proposes, harness verifies, human ratifies.
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
 meta:
-  vendor: AmazonConnect
+  vendor: amazonconnect
   report: queue
   status: proposed
-  engine: reference
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T18:12:00+00:00'
 fields:
-  QueueValue: QUEUE_ANSWER_TIME
-  AbandonedShort: CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
-  AbandonedLong: CONTACTS_ABANDONED - CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
-  HandledShort: PROACTIVE_INTENTS_ANSWERED
-  HandledLong: PROACTIVE_INTENTS_ANSWERED
-  HandleTime: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
-  HoldTime: INTERACTION_AND_HOLD_TIME
+  AbandonedLong: AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS
+  HandledLong: API_CONTACTS_HANDLED
+  HandleTime: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
+  HoldTime: SUM_INTERACTION_AND_HOLD_TIME
   WorkTime: AFTER_CONTACT_WORK_TIME
-  QueueDelayTime: QUEUE_ANSWER_TIME
+  QueueDelayTime: ESTIMATED_WAIT_TIME
   ContactsActive: ACTIVE_AI_AGENTS
 proposals:
   QueueValue:
-    proposed: QUEUE_ANSWER_TIME
-    confidence: 0.85
-    rationale: reused pattern QueueValue=key['key'] learned from approved vendors
-    needs_review: false
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching queue_key_like with unit=key
+    needs_review: true
+    needs_human: true
+    alternates: []
   AbandonedShort:
-    proposed: CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
-    confidence: 0.85
-    rationale: reused pattern AbandonedShort=single['abandon_sl'] learned from approved
-      vendors
-    needs_review: false
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching abandoned_within_sl_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
   AbandonedLong:
-    proposed: CONTACTS_ABANDONED - CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
-    confidence: 0.85
-    rationale: reused pattern AbandonedLong=diff['abandon_total', 'abandon_sl'] learned
-      from approved vendors
-    needs_review: false
+    proposed: AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS
+    confidence: 0.34
+    rationale: total-only fallback (AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS);
+      within-SL split missing
+    needs_review: true
+    needs_human: true
+    alternates: []
   HandledShort:
-    proposed: PROACTIVE_INTENTS_ANSWERED
-    confidence: 0.88
-    rationale: "no known pattern matched \u2014 naive name guess"
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching handled_within_sl_like with unit=count
     needs_review: true
+    needs_human: true
+    alternates: []
   HandledLong:
-    proposed: PROACTIVE_INTENTS_ANSWERED
-    confidence: 0.88
-    rationale: "no known pattern matched \u2014 naive name guess"
+    proposed: API_CONTACTS_HANDLED
+    confidence: 0.34
+    rationale: total-only fallback (API_CONTACTS_HANDLED); within-SL split missing
     needs_review: true
+    needs_human: true
+    alternates: []
   HandleTime:
-    proposed: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
-    confidence: 0.85
-    rationale: reused pattern HandleTime=sum['talk', 'hold'] learned from approved
-      vendors
-    needs_review: false
+    proposed: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
+    confidence: 0.48
+    rationale: composed from ['AVG_NON_TALK_TIME', 'SUM_INTERACTION_AND_HOLD_TIME']
+      per derivation
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: AVG_TALK_TIME
+      confidence: 0.48
+      note: 'alternate first-component match: AVG_TALK_TIME'
+    - formula: Non-Talk Time
+      confidence: 0.48
+      note: 'alternate first-component match: Non-Talk Time'
+    - formula: Talk Time
+      confidence: 0.48
+      note: 'alternate first-component match: Talk Time'
   HoldTime:
-    proposed: INTERACTION_AND_HOLD_TIME
-    confidence: 0.85
-    rationale: reused pattern HoldTime=single['hold'] learned from approved vendors
-    needs_review: false
+    proposed: SUM_INTERACTION_AND_HOLD_TIME
+    confidence: 0.48
+    rationale: 'best hold_time_like match: SUM_INTERACTION_AND_HOLD_TIME (weight=0.48)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: INTERACTION_AND_HOLD_TIME
+      confidence: 0.48
+      note: 'alternate hold_time_like match: INTERACTION_AND_HOLD_TIME'
+    - formula: AVG_HOLD_TIME
+      confidence: 0.48
+      note: 'alternate hold_time_like match: AVG_HOLD_TIME'
+    - formula: SUM_HOLD_TIME
+      confidence: 0.48
+      note: 'alternate hold_time_like match: SUM_HOLD_TIME'
+    - formula: Contact Hold Time
+      confidence: 0.48
+      note: 'alternate hold_time_like match: Contact Hold Time'
   WorkTime:
     proposed: AFTER_CONTACT_WORK_TIME
-    confidence: 0.85
-    rationale: reused pattern WorkTime=single['acw'] learned from approved vendors
-    needs_review: false
+    confidence: 0.48
+    rationale: 'best acw_time_like match: AFTER_CONTACT_WORK_TIME (weight=0.48)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: AVG_AFTER_CONTACT_WORK_TIME
+      confidence: 0.48
+      note: 'alternate acw_time_like match: AVG_AFTER_CONTACT_WORK_TIME'
   QueueDelayTime:
-    proposed: QUEUE_ANSWER_TIME
-    confidence: 0.85
-    rationale: reused pattern QueueDelayTime=single['wait'] learned from approved
-      vendors
+    proposed: ESTIMATED_WAIT_TIME
+    confidence: 0.78
+    rationale: 'best queue_delay_time_like match: ESTIMATED_WAIT_TIME (weight=0.78)'
     needs_review: false
+    needs_human: false
+    alternates: []
   ContactsActive:
     proposed: ACTIVE_AI_AGENTS
-    confidence: 0.85
-    rationale: reused pattern ContactsActive=single['active'] learned from approved
-      vendors
-    needs_review: false
+    confidence: 0.4
+    rationale: 'best contacts_active_like match: ACTIVE_AI_AGENTS (weight=0.40)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: SLOTS_ACTIVE
+      confidence: 0.4
+      note: 'alternate contacts_active_like match: SLOTS_ACTIVE'
+    - formula: Current Slots Active
+      confidence: 0.4
+      note: 'alternate contacts_active_like match: Current Slots Active'

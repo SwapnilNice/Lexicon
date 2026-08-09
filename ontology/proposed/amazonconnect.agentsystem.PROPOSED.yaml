@@ -1,61 +1,65 @@
-# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
-# have an expert review. AI proposes, harness verifies, human ratifies.
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
 meta:
-  vendor: AmazonConnect
+  vendor: amazonconnect
   report: agentsystem
   status: proposed
-  engine: reference
-fields:
-  AgentValue: ACTIVE_AI_AGENTS
-  InternalContacts: CONTACTS_TRANSFERRED_OUT_INTERNAL
-  InternalHandleTime: CONTACTS_TRANSFERRED_OUT_INTERNAL
-  ReadyTime: SUM_IDLE_TIME_AGENT
-  NotReadyTime: AGENT_ADHERENT_TIME
-  OutboundContacts: CONTACTS_HANDLED_OUTBOUND
-  OutboundHandleTime: SUM_CONNECTING_TIME_AGENT
-  LoginTime: AGENTS_STAFFED
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T17:16:10+00:00'
+fields: {}
 proposals:
   AgentValue:
-    proposed: ACTIVE_AI_AGENTS
-    confidence: 0.85
-    rationale: reused pattern AgentValue=key['agent_key'] learned from approved vendors
-    needs_review: false
-  InternalContacts:
-    proposed: CONTACTS_TRANSFERRED_OUT_INTERNAL
-    confidence: 0.85
-    rationale: reused pattern InternalContacts=single['internal_count'] learned from
-      approved vendors
-    needs_review: false
-  InternalHandleTime:
-    proposed: CONTACTS_TRANSFERRED_OUT_INTERNAL
-    confidence: 0.85
-    rationale: reused pattern InternalHandleTime=single['internal_time'] learned from
-      approved vendors
-    needs_review: false
-  ReadyTime:
-    proposed: SUM_IDLE_TIME_AGENT
-    confidence: 0.85
-    rationale: reused pattern ReadyTime=single['ready'] learned from approved vendors
-    needs_review: false
-  NotReadyTime:
-    proposed: AGENT_ADHERENT_TIME
-    confidence: 0.5
-    rationale: "no known pattern matched \u2014 naive name guess"
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching agent_key_like with unit=key
     needs_review: true
+    needs_human: true
+    alternates: []
+  InternalContacts:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching internal_count_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  InternalHandleTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching internal_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  ReadyTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching ready_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
+  NotReadyTime:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching not_ready_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
   OutboundContacts:
-    proposed: CONTACTS_HANDLED_OUTBOUND
-    confidence: 0.85
-    rationale: reused pattern OutboundContacts=single['outbound_count'] learned from
-      approved vendors
-    needs_review: false
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching outbound_count_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
   OutboundHandleTime:
-    proposed: SUM_CONNECTING_TIME_AGENT
-    confidence: 0.85
-    rationale: reused pattern OutboundHandleTime=single['outbound_time'] learned from
-      approved vendors
-    needs_review: false
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching outbound_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []
   LoginTime:
-    proposed: AGENTS_STAFFED
-    confidence: 0.85
-    rationale: reused pattern LoginTime=single['login'] learned from approved vendors
-    needs_review: false
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching login_time_like with unit=duration_seconds
+    needs_review: true
+    needs_human: true
+    alternates: []

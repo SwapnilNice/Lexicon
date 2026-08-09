@@ -1,0 +1,92 @@
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
+meta:
+  vendor: avaya_cms
+  report: queue
+  status: proposed
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T18:45:46+00:00'
+fields:
+  QueueValue: split
+  AbandonedShort: slvlabns
+  HandledShort: acceptable
+  HoldTime: holdtime
+  WorkTime: acwtime
+  QueueDelayTime: anstime
+proposals:
+  QueueValue:
+    proposed: split
+    confidence: 0.95
+    rationale: dialect override from ontology/avaya_cms_dialect.yaml | Split/skill
+      number is the queue key.
+    needs_review: false
+    needs_human: false
+    alternates: []
+  AbandonedShort:
+    proposed: slvlabns
+    confidence: 0.7
+    rationale: dialect override from ontology/avaya_cms_dialect.yaml | Abandons within
+      the service level (SLVLABNS, a component of ABNCALLS).
+    needs_review: true
+    needs_human: true
+    alternates: []
+  AbandonedLong:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate for abandoned_total_like
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandledShort:
+    proposed: acceptable
+    confidence: 0.95
+    rationale: dialect override from ontology/avaya_cms_dialect.yaml | ACDCALLS answered
+      within SERVICELEVEL.
+    needs_review: false
+    needs_human: false
+    alternates: []
+  HandledLong:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate for handled_total_like
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandleTime:
+    proposed: null
+    confidence: 0.0
+    rationale: 'missing components: [''talk_time_like'', ''hold_time_like'']'
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HoldTime:
+    proposed: holdtime
+    confidence: 0.95
+    rationale: dialect override from ontology/avaya_cms_dialect.yaml | holdtime (time
+      ACD callers were on hold).
+    needs_review: false
+    needs_human: false
+    alternates: []
+  WorkTime:
+    proposed: acwtime
+    confidence: 0.95
+    rationale: 'dialect override from ontology/avaya_cms_dialect.yaml | acwtime (after-call
+      work) only. | TRAP: Separate from acdtime. Never merged into HandleTime.'
+    needs_review: false
+    needs_human: false
+    alternates: []
+  QueueDelayTime:
+    proposed: anstime
+    confidence: 0.95
+    rationale: 'dialect override from ontology/avaya_cms_dialect.yaml | anstime =
+      time in queue + ringing before an agent answered. Excludes IVR. | TRAP: Do not
+      use abntime (that is abandon wait).'
+    needs_review: false
+    needs_human: false
+    alternates: []
+  ContactsActive:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching contacts_active_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []

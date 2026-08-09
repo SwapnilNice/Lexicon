@@ -3,6 +3,12 @@ __pycache__/
 .pytest_cache/
 *.pyc
 
+# macOS filesystem noise
+.DS_Store
+
+# Local Claude Code settings (per-machine, not shared)
+.claude/
+
 # Cached vendor documentation pages produced by `discover.py --crawl`.
 fixtures/vendor_docs/
 

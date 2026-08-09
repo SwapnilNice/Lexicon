@@ -1,0 +1,104 @@
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
+meta:
+  vendor: five9
+  report: queue
+  status: proposed
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T18:59:17+00:00'
+fields:
+  QueueValue: skill
+  AbandonedShort: callsAbandonedInSLA
+  AbandonedLong: callsAbandoned
+  HandledShort: callsAcceptable
+  HandledLong: callsHandled
+  HandleTime: (averageTalkTime + averageHoldTime) * callsHandled
+  HoldTime: averageHoldTime * callsHandled
+  WorkTime: averageWrapTime * callsHandled
+  QueueDelayTime: averageQueueTime * callsHandled
+  ContactsActive: callsInQueue
+proposals:
+  QueueValue:
+    proposed: skill
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Skill name (Five9's
+      routing entity for queue-style routing) or Campaign name for outbound.
+    needs_review: true
+    needs_human: true
+    alternates: []
+  AbandonedShort:
+    proposed: callsAbandonedInSLA
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Abandons within
+      the Service Level threshold. If not tracked separately, put 0 and put total
+      in AbandonedLong.
+    needs_review: true
+    needs_human: true
+    alternates: []
+  AbandonedLong:
+    proposed: callsAbandoned
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Calls abandoned
+      by the customer before an agent accepted.
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandledShort:
+    proposed: callsAcceptable
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Calls answered
+      within Service Level threshold.
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandledLong:
+    proposed: callsHandled
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Total handled ACD
+      calls in the interval.
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandleTime:
+    proposed: (averageTalkTime + averageHoldTime) * callsHandled
+    confidence: 0.7
+    rationale: "dialect override from ontology/five9_dialect.yaml | HandleTime = TALK\
+      \ + HOLD, excluding ACW. Five9 exposes averages, so multiply by callsHandled.\
+      \ | TRAP: Do NOT use Five9's `averageHandleTime` \u2014 that INCLUDES wrap (ACW),\
+      \ which WFM keeps separate as WorkTime."
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HoldTime:
+    proposed: averageHoldTime * callsHandled
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Total hold time
+      = average * count.
+    needs_review: true
+    needs_human: true
+    alternates: []
+  WorkTime:
+    proposed: averageWrapTime * callsHandled
+    confidence: 0.7
+    rationale: 'dialect override from ontology/five9_dialect.yaml | Total ACW time
+      = average wrap * count. | TRAP: Wrap = ACW = After Call Work. Kept SEPARATE
+      from HandleTime.'
+    needs_review: true
+    needs_human: true
+    alternates: []
+  QueueDelayTime:
+    proposed: averageQueueTime * callsHandled
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Total queue wait
+      time = average queue time * calls handled (approximation; ignores abandoned).
+    needs_review: true
+    needs_human: true
+    alternates: []
+  ContactsActive:
+    proposed: callsInQueue
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Calls currently
+      waiting in queue (real-time snapshot; approximates carryover if sampled at interval
+      boundary).
+    needs_review: true
+    needs_human: true
+    alternates: []

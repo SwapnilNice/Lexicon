@@ -1,47 +1,99 @@
-# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
-# have an expert review. AI proposes, harness verifies, human ratifies.
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
 meta:
-  vendor: AmazonConnect
+  vendor: amazonconnect
   report: agentqueue
   status: proposed
-  engine: reference
+  produced_by: lexicon-discover
+  produced_at: '2026-08-09T18:12:23+00:00'
 fields:
-  QueueValue: QUEUE_ANSWER_TIME
-  AgentValue: ACTIVE_AI_AGENTS
-  Handled: PROACTIVE_INTENTS_ANSWERED
-  HandleTime: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
-  HoldTime: INTERACTION_AND_HOLD_TIME
+  AgentValue: AGENT_ANSWER_RATE
+  Handled: API_CONTACTS_HANDLED
+  HandleTime: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
+  HoldTime: SUM_INTERACTION_AND_HOLD_TIME
   WorkTime: AFTER_CONTACT_WORK_TIME
 proposals:
   QueueValue:
-    proposed: QUEUE_ANSWER_TIME
-    confidence: 0.85
-    rationale: reused pattern QueueValue=key['key'] learned from approved vendors
-    needs_review: false
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching queue_key_like with unit=key
+    needs_review: true
+    needs_human: true
+    alternates: []
   AgentValue:
-    proposed: ACTIVE_AI_AGENTS
-    confidence: 0.85
-    rationale: reused pattern AgentValue=key['agent_key'] learned from approved vendors
+    proposed: AGENT_ANSWER_RATE
+    confidence: 0.78
+    rationale: 'best agent_key_like match: AGENT_ANSWER_RATE (weight=0.78)'
     needs_review: false
+    needs_human: false
+    alternates:
+    - formula: AI_AGENT_INVOCATION_SUCCESS_RATE
+      confidence: 0.78
+      note: 'alternate agent_key_like match: AI_AGENT_INVOCATION_SUCCESS_RATE'
   Handled:
-    proposed: PROACTIVE_INTENTS_ANSWERED
-    confidence: 0.85
-    rationale: reused pattern Handled=single['handled_total'] learned from approved
-      vendors
-    needs_review: false
+    proposed: API_CONTACTS_HANDLED
+    confidence: 0.56
+    rationale: 'best handled_total_like match: API_CONTACTS_HANDLED (weight=0.56)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: CALLBACK_CONTACTS_HANDLED
+      confidence: 0.56
+      note: 'alternate handled_total_like match: CALLBACK_CONTACTS_HANDLED'
+    - formula: CONTACTS_HANDLED
+      confidence: 0.56
+      note: 'alternate handled_total_like match: CONTACTS_HANDLED'
+    - formula: CONTACTS_HANDLED_INCOMING
+      confidence: 0.56
+      note: 'alternate handled_total_like match: CONTACTS_HANDLED_INCOMING'
+    - formula: CONTACTS_HANDLED_OUTBOUND
+      confidence: 0.56
+      note: 'alternate handled_total_like match: CONTACTS_HANDLED_OUTBOUND'
+    - formula: HUMAN_ANSWERED_CALLS
+      confidence: 0.56
+      note: 'alternate handled_total_like match: HUMAN_ANSWERED_CALLS'
   HandleTime:
-    proposed: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
-    confidence: 0.85
-    rationale: reused pattern HandleTime=sum['talk', 'hold'] learned from approved
-      vendors
-    needs_review: false
+    proposed: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
+    confidence: 0.48
+    rationale: composed from ['AVG_NON_TALK_TIME', 'SUM_INTERACTION_AND_HOLD_TIME']
+      per derivation
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: AVG_TALK_TIME
+      confidence: 0.48
+      note: 'alternate first-component match: AVG_TALK_TIME'
+    - formula: Non-Talk Time
+      confidence: 0.48
+      note: 'alternate first-component match: Non-Talk Time'
+    - formula: Talk Time
+      confidence: 0.48
+      note: 'alternate first-component match: Talk Time'
   HoldTime:
-    proposed: INTERACTION_AND_HOLD_TIME
-    confidence: 0.85
-    rationale: reused pattern HoldTime=single['hold'] learned from approved vendors
-    needs_review: false
+    proposed: SUM_INTERACTION_AND_HOLD_TIME
+    confidence: 0.48
+    rationale: 'best hold_time_like match: SUM_INTERACTION_AND_HOLD_TIME (weight=0.48)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: INTERACTION_AND_HOLD_TIME
+      confidence: 0.48
+      note: 'alternate hold_time_like match: INTERACTION_AND_HOLD_TIME'
+    - formula: AVG_HOLD_TIME
+      confidence: 0.48
+      note: 'alternate hold_time_like match: AVG_HOLD_TIME'
+    - formula: SUM_HOLD_TIME
+      confidence: 0.48
+      note: 'alternate hold_time_like match: SUM_HOLD_TIME'
+    - formula: Contact Hold Time
+      confidence: 0.48
+      note: 'alternate hold_time_like match: Contact Hold Time'
   WorkTime:
     proposed: AFTER_CONTACT_WORK_TIME
-    confidence: 0.85
-    rationale: reused pattern WorkTime=single['acw'] learned from approved vendors
-    needs_review: false
+    confidence: 0.48
+    rationale: 'best acw_time_like match: AFTER_CONTACT_WORK_TIME (weight=0.48)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: AVG_AFTER_CONTACT_WORK_TIME
+      confidence: 0.48
+      note: 'alternate acw_time_like match: AVG_AFTER_CONTACT_WORK_TIME'
