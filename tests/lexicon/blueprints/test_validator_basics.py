@@ -160,3 +160,37 @@ def test_produces_events_unknown_event_is_error(tmp_path):
     bp = parse_blueprint(p)
     errors = validate(bp, schema, events)
     assert any(e.severity == "error" and "made.up.event" in e.message for e in errors)
+
+
+def test_channels_as_scalar_string_is_error_not_char_iteration(tmp_path):
+    """A user who forgets brackets shouldn't get 'channel v not in schema.channels' etc."""
+    schema, events = _load_real_schema_events()
+    body = VALID_MIN.replace("channels: [voice]", "channels: voice")
+    p = _write(tmp_path, "salesforce/queue_based.md", body)
+    bp = parse_blueprint(p)
+    errors = validate(bp, schema, events)
+    # Should get exactly ONE clear error about the type — not one per character
+    type_errors = [e for e in errors if e.severity == "error" and "channels must be a YAML list" in e.message]
+    assert len(type_errors) == 1
+    # And there should be no spurious "channel 'v' not in ..." errors
+    per_char_errors = [e for e in errors if e.severity == "error"
+                       and "channel=" in e.message and len(e.message.split("channel=")[1].split(" ")[0]) <= 4]
+    assert per_char_errors == []
+
+
+def test_produces_events_as_scalar_string_is_error_not_char_iteration(tmp_path):
+    schema, events = _load_real_schema_events()
+    # Replace the multi-line list with a single quoted scalar — valid YAML, wrong type.
+    body = VALID_MIN.replace(
+        "produces_events: [interaction.received, interaction.routed, interaction.accepted,\n"
+        "                  interaction.talk.start, interaction.talk.end,\n"
+        "                  interaction.acw.start, interaction.acw.end,\n"
+        "                  interaction.abandoned, interaction.completed,\n"
+        "                  agent.login, agent.logout, agent.presence.change]",
+        "produces_events: interaction.received",
+    )
+    p = _write(tmp_path, "salesforce/queue_based.md", body)
+    bp = parse_blueprint(p)
+    errors = validate(bp, schema, events)
+    type_errors = [e for e in errors if e.severity == "error" and "produces_events must be a YAML list" in e.message]
+    assert len(type_errors) == 1

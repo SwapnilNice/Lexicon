@@ -14,7 +14,8 @@ def discover(root: Path) -> list[Path]:
     out: list[Path] = []
     for path in sorted(root.rglob("*.md")):
         try:
-            head = "".join(path.open("r").readlines()[:20])
+            with path.open("r") as fh:
+                head = "".join(fh.readlines()[:20])
         except OSError:
             continue
         stripped = head.lstrip("\n")

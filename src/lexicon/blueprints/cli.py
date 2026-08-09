@@ -46,7 +46,8 @@ def cmd_list(args) -> int:
     print(f"{'PLATFORM':16} {'ROUTING':20} {'VERSION':8} VERIFIED")
     for path in files:
         import yaml
-        head = "".join(path.open("r").readlines()[:40])
+        with path.open("r") as fh:
+            head = "".join(fh.readlines()[:40])
         try:
             fm_text = head.split("---")[1]
             fm = yaml.safe_load(fm_text) or {}

@@ -199,3 +199,47 @@ def test_object_footprint_wrong_column_order_is_error(tmp_path):
     errors = _errs(p)
     assert any(e.severity == "error" and ("column" in e.message.lower()
                or "footprint" in e.message.lower()) for e in errors)
+
+
+def test_prerequisite_events_referencing_unknown_event_is_error(tmp_path):
+    # Replace a valid prerequisite with a made-up one.
+    body = VALID_MIN.replace(
+        "### interaction.routed\n"
+        "- **Recorded in:** X\n"
+        "- **Trigger:** Y\n"
+        "- **Prerequisite events:** interaction.received\n",
+        "### interaction.routed\n"
+        "- **Recorded in:** X\n"
+        "- **Trigger:** Y\n"
+        "- **Prerequisite events:** made.up.prereq\n",
+    )
+    p = _write(tmp_path, body)
+    errors = _errs(p)
+    assert any(e.severity == "error" and "made.up.prereq" in e.message for e in errors)
+
+
+def test_object_footprint_whitespace_only_body_is_error(tmp_path):
+    body = VALID_MIN.replace(
+        "# Object footprint\n"
+        "| Concept | Platform object.field | Populated when | Notes |\n"
+        "|---|---|---|---|\n"
+        "| routing_entity | Queue.Name | admin creates | n |\n",
+        "# Object footprint\n\n\n",
+    )
+    p = _write(tmp_path, body)
+    errors = _errs(p)
+    assert any(e.severity == "error" and "no markdown table found" in e.message.lower()
+               or (e.severity == "error" and "footprint" in e.message.lower() and "no" in e.message.lower())
+               for e in errors)
+
+
+def test_missing_known_traps_is_warning_not_error(tmp_path):
+    # VALID_MIN already lacks Known traps.
+    p = _write(tmp_path, VALID_MIN)
+    errors = _errs(p)
+    # There should be a WARNING (not error) about Known traps
+    warnings = [e for e in errors if e.severity == "warning" and "Known traps" in e.message]
+    assert warnings, "expected a warning about missing 'Known traps' section"
+    # And no error about it
+    hard_errors_about_traps = [e for e in errors if e.severity == "error" and "Known traps" in e.message]
+    assert hard_errors_about_traps == []

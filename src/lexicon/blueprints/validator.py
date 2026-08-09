@@ -41,7 +41,15 @@ def validate(bp: ParsedBlueprint, schema: SchemaDef, events: EventTaxonomy) -> l
             bp.path, "frontmatter",
             f"routing_model={fm['routing_model']!r} not in schema.routing_models ({sorted(schema.routing_models)})",
         ))
-    for ch in fm.get("channels") or []:
+    channels_val = fm.get("channels")
+    if channels_val is not None and not isinstance(channels_val, list):
+        errors.append(_err(
+            bp.path, "frontmatter",
+            f"channels must be a YAML list; got {type(channels_val).__name__} ({channels_val!r}). "
+            f"Use `channels: [voice, chat]`, not `channels: voice`.",
+        ))
+        channels_val = []
+    for ch in channels_val or []:
         if ch not in schema.channels:
             errors.append(_err(
                 bp.path, "frontmatter",
@@ -60,7 +68,15 @@ def validate(bp: ParsedBlueprint, schema: SchemaDef, events: EventTaxonomy) -> l
             ))
 
     # --- 4. produces_events references valid events ---
-    for ev in fm.get("produces_events") or []:
+    produces_val = fm.get("produces_events")
+    if produces_val is not None and not isinstance(produces_val, list):
+        errors.append(_err(
+            bp.path, "frontmatter",
+            f"produces_events must be a YAML list; got {type(produces_val).__name__} ({produces_val!r}). "
+            f"Use `produces_events: [interaction.received, ...]`.",
+        ))
+        produces_val = []
+    for ev in produces_val or []:
         if ev not in events.events:
             errors.append(_err(
                 bp.path, "frontmatter",
@@ -68,7 +84,7 @@ def validate(bp: ParsedBlueprint, schema: SchemaDef, events: EventTaxonomy) -> l
             ))
 
     # --- 4a. All non-optional events must appear in produces_events ---
-    declared_events = set(fm.get("produces_events") or [])
+    declared_events = set(produces_val or [])
     for ev_name, ev_def in events.events.items():
         if not ev_def.optional and ev_name not in declared_events:
             errors.append(_err(
@@ -97,9 +113,14 @@ def validate(bp: ParsedBlueprint, schema: SchemaDef, events: EventTaxonomy) -> l
     for req in schema.required_sections:
         if req not in section_names:
             errors.append(_err(bp.path, req, f"missing required section {req!r}"))
+    if "Known traps" not in section_names:
+        errors.append(_warn(
+            bp.path, "Known traps",
+            "recommended section 'Known traps' is missing",
+        ))
 
     # --- 7. produces_events ↔ event subsections one-to-one ---
-    declared = set(fm.get("produces_events") or [])
+    declared = set(produces_val or [])
     found = set(bp.event_subsections.keys())
     for missing_ev in declared - found:
         errors.append(_err(
@@ -126,13 +147,38 @@ def validate(bp: ParsedBlueprint, schema: SchemaDef, events: EventTaxonomy) -> l
                 bp.path, f"### {ev}",
                 f"missing optional micro-field 'Caveats' in event subsection {ev!r}",
             ))
+        pe_value = fields.get("Prerequisite events")
+        if pe_value:
+            for token in _parse_prerequisite_events_value(pe_value):
+                if token not in events.events:
+                    errors.append(_err(
+                        bp.path, f"### {ev}",
+                        f"Prerequisite events references {token!r} which is not in events.yaml",
+                    ))
 
     # --- 9. Object footprint table ---
-    footprint_body = dict(bp.sections).get("Object footprint", "")
-    if footprint_body.strip():
+    if "Object footprint" in [h for h, _ in bp.sections]:
+        footprint_body = dict(bp.sections).get("Object footprint", "")
         errors.extend(_validate_object_footprint(bp.path, footprint_body, schema))
 
     return errors
+
+
+def _parse_prerequisite_events_value(value: str) -> list[str]:
+    """Parse a 'Prerequisite events:' value into event names.
+
+    Supported forms:
+      "none"                    → []
+      "event.a"                 → ["event.a"]
+      "event.a, event.b"        → ["event.a", "event.b"]
+      "event.a and event.b"     → ["event.a", "event.b"]
+    """
+    stripped = value.strip()
+    if not stripped or stripped.lower() == "none":
+        return []
+    # Split on commas or " and "
+    parts = [p.strip() for p in stripped.replace(" and ", ",").split(",")]
+    return [p for p in parts if p]
 
 
 def _validate_object_footprint(path: Path, body: str, schema: SchemaDef) -> list[ValidationError]:
