@@ -30,6 +30,7 @@ TAG_LEXICON: dict[str, set[str]] = {
     "talk_time_like":       {"talk", "acdtime", "ttalk", "converse"},
     "hold_time_like":       {"hold", "held", "holdtime", "theld", "park"},
     "acw_time_like":        {"acw", "wrap", "wrapup", "aftercall", "after_call",
+                             "aftercontactwork", "after_contact_work",
                              "worktime", "tacw", "acwtime"},
     "queue_delay_time_like": {"delay", "wait", "answered", "ans", "anstime",
                               "queuetime", "tanswered", "queue_time"},

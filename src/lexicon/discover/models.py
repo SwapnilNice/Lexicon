@@ -18,6 +18,9 @@ from typing import Any, Literal
 #   Fetcher input (RegistrySource.kind)   Extractor input (SourceDoc.kind)
 #   ---------------------------------     ------------------------------
 #   html_doc  (a documentation site)  →   html            (a fetched HTML page)
+#                                     →   markdown        (fetched content that looks
+#                                                          like Markdown, not HTML —
+#                                                          e.g. AWS's .md variants)
 #   openapi   (an OpenAPI spec URL)   →   openapi_schema  (one schema object)
 #   graphql   (a GraphQL endpoint)    →   graphql_type    (one named type)
 #   wsdl      (a WSDL URL)            →   wsdl_type       (one named type)
@@ -25,7 +28,7 @@ from typing import Any, Literal
 # Fetch strategies own this translation. Extractors dispatch on SourceDoc.kind.
 # ---------------------------------------------------------------------------
 SourceKind = Literal[
-    "html", "openapi_schema", "graphql_type", "wsdl_type",
+    "html", "markdown", "openapi_schema", "graphql_type", "wsdl_type",
 ]
 
 

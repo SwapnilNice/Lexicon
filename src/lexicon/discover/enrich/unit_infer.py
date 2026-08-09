@@ -14,10 +14,10 @@ import re
 from ..models import EnrichedField
 
 
-NAME_MS = re.compile(r"(_ms$|Ms$|_millis)")
-NAME_SEC = re.compile(r"(_seconds$|_sec$|Time$|time$)")
-NAME_PCT = re.compile(r"(Pct$|Percent$|_percent$)")
-NAME_COUNT = re.compile(r"^n[A-Z]|_count$|Count$")
+NAME_MS = re.compile(r"(_ms$|Ms$|_millis|_MS$)", re.IGNORECASE)
+NAME_SEC = re.compile(r"(_seconds?$|_sec$|time$)", re.IGNORECASE)
+NAME_PCT = re.compile(r"(pct$|percent$|_percent$|_rate$)", re.IGNORECASE)
+NAME_COUNT = re.compile(r"^n[A-Z]|_count$|count$|^sum_|^num_", re.IGNORECASE)
 
 DESC_MS = re.compile(r"\b(?:in\s+)?milliseconds\b", re.I)
 DESC_SEC = re.compile(r"\b(?:in\s+)?seconds\b", re.I)

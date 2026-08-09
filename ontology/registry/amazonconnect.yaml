@@ -1,0 +1,36 @@
+slug: amazonconnect
+name: "Amazon Connect"
+aliases:
+  - "AWS Connect"
+  - "AmazonConnect"
+  - "amazon_connect"
+category: fixed_schema
+description: >
+  AWS cloud contact center. Historical metrics are exposed via the
+  GetMetricDataV2 API and the metrics-definitions reference in the
+  Amazon Connect administrator guide. Docs are publicly-hosted static
+  content on docs.aws.amazon.com.
+
+sources:
+  # AWS publishes a .md sibling of every .html page — the Markdown variant has
+  # the same content in a form the pipeline's Markdown extractor can parse
+  # (## <Metric> headings with API IDs in code fences). Pointing at .md
+  # directly is more reliable than counting on .html to have field tables.
+  - kind: html_doc
+    role: primary
+    url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
+    crawl:
+      max_depth: 1
+      max_pages: 5
+
+  # Custom metric primitives — sibling .md page also worth extracting.
+  - kind: html_doc
+    role: secondary
+    url: https://docs.aws.amazon.com/connect/latest/adminguide/metric-primitive-definitions.md
+    crawl:
+      max_depth: 1
+      max_pages: 3
+
+version:
+  system_version: "current"
+  last_verified: "2026-08-09"

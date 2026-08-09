@@ -34,6 +34,28 @@ def _extract_title_and_text(html: str) -> tuple[str, str]:
     return title, text
 
 
+def _looks_like_markdown(url: str, content: str) -> bool:
+    """Heuristic: is this content Markdown rather than HTML?
+
+    Signals:
+      - URL ends in `.md`
+      - Content has no `<html>` / `<body>` tags but does have `## ` heading lines
+    """
+    if url.endswith(".md"):
+        return True
+    stripped = content.lstrip()
+    if stripped.startswith("<"):
+        return False   # HTML-ish document
+    has_h2 = bool(re.search(r"^##\s", stripped, re.MULTILINE))
+    return has_h2
+
+
+def _markdown_title(md: str) -> str:
+    """First `# Title` heading in the document, or empty string."""
+    m = re.search(r"^#\s+(.+)$", md, re.MULTILINE)
+    return m.group(1).strip() if m else ""
+
+
 def fetch_html_source(
     source: RegistrySource,
     *,
@@ -52,10 +74,20 @@ def fetch_html_source(
             )
         body = fetcher(source.url)
         cache.put("http", source.url, body)
-    html = body.decode("utf-8", errors="ignore")
-    title, text = _extract_title_and_text(html)
+    content = body.decode("utf-8", errors="ignore")
+
+    if _looks_like_markdown(source.url, content):
+        doc_id = f"md:{hashlib.sha256(source.url.encode()).hexdigest()[:12]}"
+        return [SourceDoc(
+            id=doc_id, kind="markdown", url=source.url,
+            title=_markdown_title(content),
+            content=content,
+            text="",
+        )]
+
+    title, text = _extract_title_and_text(content)
     doc_id = f"html:{hashlib.sha256(source.url.encode()).hexdigest()[:12]}"
     return [SourceDoc(
         id=doc_id, kind="html", url=source.url,
-        title=title, content=html, text=text,
+        title=title, content=content, text=text,
     )]

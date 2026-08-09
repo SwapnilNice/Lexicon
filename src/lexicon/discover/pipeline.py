@@ -15,6 +15,7 @@ from .enrich.semantic_tag import tag_fields
 from .enrich.trap_detect import detect_traps
 from .enrich.unit_infer import infer_units
 from .extract.html_structured import extract_html_structured
+from .extract.markdown import extract_markdown
 from .extract.openapi import extract_openapi
 from .fetch.html import fetch_html_source
 from .fetch.openapi import fetch_openapi_source
@@ -56,6 +57,8 @@ def _extract(docs: list[SourceDoc]) -> list[RawField]:
     for d in docs:
         if d.kind == "html":
             out.extend(extract_html_structured(d))
+        elif d.kind == "markdown":
+            out.extend(extract_markdown(d))
         elif d.kind == "openapi_schema":
             out.extend(extract_openapi(d))
     return out
