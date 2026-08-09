@@ -1,0 +1,130 @@
+# Canonical ACD event taxonomy — vendor-neutral catalog of events a
+# flow-configured platform can emit.
+# See docs/superpowers/specs/2026-08-09-flow-blueprint-design.md §6.
+
+meta:
+  version: "1.0"
+  description: "Vendor-neutral catalog of ACD events a flow-configured platform can emit."
+
+# ---------------------------------------------------------------------------
+# Presence state taxonomy — referenced by agent.presence.change attributes.
+# ---------------------------------------------------------------------------
+presence_states:
+  ready:
+    description: "Available to receive routed interactions."
+  not_ready:
+    description: "Logged in but not available (aux, away, break)."
+  busy:
+    description: "Actively handling one or more interactions."
+  acw:
+    description: "In after-call-work / wrap-up after an interaction."
+  offline:
+    description: "Logged out or ended session."
+
+# ---------------------------------------------------------------------------
+# Events. `prerequisites` form a DAG (validator enforces no cycles).
+# `optional: true` events are per-blueprint choices; `optional: false` events
+# must appear in every blueprint's produces_events list.
+# `projects_to_canonical_wfm` is a hook for sub-project B4 — not consumed in v1.
+# ---------------------------------------------------------------------------
+events:
+  interaction.received:
+    description: "An interaction (call, chat, email, case) reaches the routing layer."
+    prerequisites: []
+    optional: false
+
+  interaction.routed:
+    description: "The routing layer assigns the interaction to an agent."
+    prerequisites: [interaction.received]
+    optional: false
+
+  interaction.accepted:
+    description: "The agent accepts the routed interaction."
+    prerequisites: [interaction.routed]
+    optional: false
+
+  interaction.declined:
+    description: "The agent explicitly declines the routed interaction."
+    prerequisites: [interaction.routed]
+    optional: true
+
+  interaction.expired:
+    description: "The routing layer times out waiting for agent acceptance."
+    prerequisites: [interaction.routed]
+    optional: true
+
+  interaction.talk.start:
+    description: "Talk time begins. For voice: line connected. For chat: first agent message."
+    prerequisites: [interaction.accepted]
+    optional: false
+    projects_to_canonical_wfm: talk_time
+
+  interaction.talk.end:
+    description: "Talk time ends. Line disconnects (or hold begins) / agent closes session."
+    prerequisites: [interaction.talk.start]
+    optional: false
+
+  interaction.hold.start:
+    description: "Agent places the customer on hold."
+    prerequisites: [interaction.talk.start]
+    optional: true
+    projects_to_canonical_wfm: hold_time
+
+  interaction.hold.end:
+    description: "Agent takes the customer off hold; talk time resumes."
+    prerequisites: [interaction.hold.start]
+    optional: true
+
+  interaction.acw.start:
+    description: "After-call-work begins. Talk time ends but the interaction is not yet closed."
+    prerequisites: [interaction.talk.end]
+    optional: false
+    projects_to_canonical_wfm: acw_time
+
+  interaction.acw.end:
+    description: "Agent completes wrap-up; interaction closes."
+    prerequisites: [interaction.acw.start]
+    optional: false
+
+  interaction.transferred:
+    description: "The interaction is transferred to another agent, queue, or external number."
+    prerequisites: [interaction.accepted]
+    optional: true
+    attributes:
+      type:
+        values: [warm, cold, blind]
+
+  interaction.consulted:
+    description: "Primary agent consults a second agent while keeping the customer on the interaction."
+    prerequisites: [interaction.accepted]
+    optional: true
+
+  interaction.abandoned:
+    description: "The customer disconnects before an agent accepts."
+    prerequisites: [interaction.received]
+    optional: false
+
+  interaction.completed:
+    description: "Terminal state: interaction is fully closed (post-ACW)."
+    prerequisites: [interaction.acw.end]
+    optional: false
+
+  agent.login:
+    description: "Agent begins a work session."
+    prerequisites: []
+    optional: false
+
+  agent.logout:
+    description: "Agent ends the work session."
+    prerequisites: [agent.login]
+    optional: false
+
+  agent.presence.change:
+    description: "Agent transitions between presence states."
+    prerequisites: [agent.login]
+    optional: false
+    attributes:
+      from_state:
+        references: presence_states
+      to_state:
+        references: presence_states
