@@ -31,6 +31,36 @@ sources:
       max_depth: 1
       max_pages: 3
 
+access:
+  - method: rest_api
+    description: >
+      GetMetricDataV2 returns historical metrics for queues, agents, and
+      channels over any 24-hour+ window. GetCurrentMetricData returns
+      real-time queue metrics.
+    endpoint: "https://connect.<region>.amazonaws.com/v2/metric-data"
+    format: "json"
+    auth: [aws_signature_v4, iam_role]
+    docs: "https://docs.aws.amazon.com/connect/latest/APIReference/API_GetMetricDataV2.html"
+    notes: "SigV4 credentials must have the connect:GetMetricDataV2 IAM permission. Default rate limit ~2 TPS."
+
+  - method: file_export
+    description: >
+      Contact Trace Records (CTR) and Agent Event Streams are pushed to
+      Amazon Kinesis / S3 in JSON. Useful for high-volume historical
+      analytics without polling the API.
+    format: "json"
+    auth: [aws_signature_v4, iam_role]
+    docs: "https://docs.aws.amazon.com/connect/latest/adminguide/contact-trace-records.html"
+    notes: "Delivery is Kinesis-first, then customer-configured S3 destination via Kinesis Firehose."
+
+  - method: streaming
+    description: >
+      Real-time agent event stream via Kinesis. Every agent state transition
+      (login, presence change, ACW start, etc.) is pushed as a JSON event.
+    format: "json"
+    auth: [aws_signature_v4, iam_role]
+    docs: "https://docs.aws.amazon.com/connect/latest/adminguide/agent-event-stream.html"
+
 version:
   system_version: "current"
   last_verified: "2026-08-09"

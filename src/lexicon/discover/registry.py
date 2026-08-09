@@ -5,11 +5,20 @@ from __future__ import annotations
 from pathlib import Path
 import yaml
 
-from .models import RegistrySource, VendorRegistryEntry
+from .models import RegistryAccess, RegistrySource, VendorRegistryEntry
 from .validation import validate_slug
 
 VALID_CATEGORIES = {"fixed_schema", "flow_configured"}
 VALID_SOURCE_KINDS = {"html_doc", "openapi", "graphql", "wsdl"}
+VALID_ACCESS_METHODS = {
+    "rest_api", "soap_api", "graphql_api",
+    "file_export", "database_direct", "webhook_push", "streaming",
+}
+VALID_AUTH_METHODS = {
+    "api_key", "oauth2_client_credentials", "oauth2_authorization_code",
+    "basic_auth", "bearer_token", "session_token",
+    "mtls", "aws_signature_v4", "iam_role", "sso_saml", "sshkey",
+}
 
 
 class RegistryError(ValueError):
@@ -43,6 +52,30 @@ def _load_one(path: Path) -> VendorRegistryEntry:
                 crawl=s.get("crawl", {}),
             )
         )
+    access = []
+    for i, a in enumerate(raw.get("access") or []):
+        method = a.get("method")
+        if method not in VALID_ACCESS_METHODS:
+            raise RegistryError(
+                f"{path.name}: access[{i}].method={method!r} not in {sorted(VALID_ACCESS_METHODS)}"
+            )
+        auth = tuple(a.get("auth") or ())
+        for auth_m in auth:
+            if auth_m not in VALID_AUTH_METHODS:
+                raise RegistryError(
+                    f"{path.name}: access[{i}].auth contains {auth_m!r}; "
+                    f"must be one of {sorted(VALID_AUTH_METHODS)}"
+                )
+        access.append(RegistryAccess(
+            method=method,
+            description=a.get("description", ""),
+            endpoint=a.get("endpoint"),
+            format=a.get("format"),
+            auth=auth,
+            docs=a.get("docs"),
+            notes=a.get("notes", ""),
+        ))
+
     return VendorRegistryEntry(
         slug=raw["slug"],
         name=raw["name"],
@@ -50,6 +83,7 @@ def _load_one(path: Path) -> VendorRegistryEntry:
         category=raw["category"],
         description=raw["description"],
         sources=sources,
+        access=access,
         version=raw.get("version", {}),
     )
 

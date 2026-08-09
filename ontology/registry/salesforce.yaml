@@ -27,6 +27,35 @@ description: >
 # blueprint document, not a fetch URL.
 sources: []
 
+access:
+  - method: rest_api
+    description: >
+      Salesforce REST API — SOQL queries against Omni-Channel objects
+      (AgentWork, PendingServiceRouting, UserServicePresence, VoiceCall).
+      Best path for aggregating historical ACD data from configured flows.
+    endpoint: "https://<instance>.my.salesforce.com/services/data/v60.0/query"
+    format: "json"
+    auth: [oauth2_client_credentials, oauth2_authorization_code, sso_saml]
+    docs: "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/"
+    notes: "Connected App with OAuth is the standard integration path. Server-to-server uses JWT bearer flow (client_credentials variant)."
+
+  - method: streaming
+    description: >
+      Platform Events / Change Data Capture over CometD / Pub-Sub API.
+      Delivers real-time notifications when AgentWork / UserServicePresence
+      rows change, without polling.
+    format: "json"
+    auth: [oauth2_client_credentials, oauth2_authorization_code]
+    docs: "https://developer.salesforce.com/docs/platform/pub-sub-api/overview"
+
+  - method: file_export
+    description: >
+      Bulk API 2.0 — asynchronous large-volume query export. Useful for
+      backfilling long historical windows without hitting REST rate limits.
+    format: "csv"
+    auth: [oauth2_client_credentials]
+    docs: "https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/"
+
 version:
   system_version: "Spring '26"
   last_verified: "2026-08-09"

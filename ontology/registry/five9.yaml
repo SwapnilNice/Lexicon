@@ -37,6 +37,33 @@ sources:
       max_depth: 0
       max_pages: 1
 
+access:
+  - method: soap_api
+    description: >
+      Statistics API (SOAP/WSDL) delivers historical + real-time supervisor
+      statistics. Statistics endpoint has separate WSDLs per role.
+    endpoint: "https://api.five9.com/wssupervisor/v13_0/SupervisorWebService?wsdl"
+    format: "soap_envelope"
+    auth: [basic_auth]
+    docs: "https://documentation-be.five9.com/bundle/dashboard-report-catalog/raw/resource/enus/dashboard-report-catalog.pdf"
+    notes: "Basic auth with Five9 admin credentials. WSDL varies by version — check with your Five9 rep for current version."
+
+  - method: rest_api
+    description: >
+      Reporting REST API (MASH) — modern JSON-based alternative to the
+      Statistics SOAP API for pulling historical reports.
+    endpoint: "https://<vcc>.five9.com/mash/v2/reports"
+    format: "json"
+    auth: [oauth2_client_credentials, basic_auth]
+    notes: "Newer API — coverage of historical metrics is expanding. Check availability for your VCC edition."
+
+  - method: file_export
+    description: >
+      Scheduled report exports via VCC UI — reports can be scheduled and
+      pushed to email or delivered via FTP.
+    format: "csv"
+    auth: [basic_auth, sshkey]
+
 version:
   system_version: "current"
   last_verified: "2026-08-09"

@@ -57,4 +57,4 @@ def test_lexicon_covers_required_concepts():
         "abandoned_total_like", "abandoned_within_sl_like",
         "queue_key_like", "agent_key_like", "contacts_active_like",
     }
-    assert required.issubset(set(TAG_LEXICON))
+    assert required.issubset(set(TAG_LEXICON()))

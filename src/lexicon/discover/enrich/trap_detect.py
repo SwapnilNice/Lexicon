@@ -1,15 +1,22 @@
 """Trap detection. Looks for phrasings and unit mismatches that flag
 known semantic risks:
 
-  - exclusion: "does NOT include X" / "excludes X"    (e.g. Avaya acdtime)
-  - inclusion: "includes X" / "combined with X"       (e.g. Genesys tHandle)
+  - exclusion: "does NOT include X" / "excludes X"
+  - inclusion: "includes X" / "combined with X"
   - unit_slip: this field's unit differs from its peer group's
 
-The mapper (Task 18) reads these traps to inform compositional formulas.
+The mapper reads these traps to inform compositional formulas. The
+`canonical_target_map` used to normalize free-text concept mentions
+to canonical slugs lives in ontology/discover_lexicon.yaml so framework
+code contains no vendor tokens.
 """
 from __future__ import annotations
+from functools import lru_cache
+from pathlib import Path
 import re
 from collections import Counter
+
+import yaml
 
 from ..models import EnrichedField, Trap
 
@@ -24,23 +31,18 @@ INCLUDE_RE = re.compile(
 )
 
 
-_TARGET_CANONICAL = {
-    "hold": "hold_time",
-    "holdtime": "hold_time",
-    "acw": "acw_time",
-    "wrapup": "acw_time",
-    "wrap": "acw_time",
-    "wrap-up": "acw_time",
-    "after-call": "acw_time",
-    "aftercall": "acw_time",
-    "talk": "talk_time",
-    "talktime": "talk_time",
-}
+_LEXICON_PATH = Path(__file__).resolve().parents[4] / "ontology" / "discover_lexicon.yaml"
+
+
+@lru_cache(maxsize=1)
+def _load_canonical_target_map() -> dict[str, str]:
+    raw = yaml.safe_load(_LEXICON_PATH.read_text()) or {}
+    return dict(raw.get("canonical_target_map") or {})
 
 
 def _target_of(mention: str) -> str:
     key = re.split(r"\s+", mention.lower())[0].strip(".,;:")
-    return _TARGET_CANONICAL.get(key, key)
+    return _load_canonical_target_map().get(key, key)
 
 
 def _detect_phrase_traps(field: EnrichedField) -> None:

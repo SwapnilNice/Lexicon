@@ -107,6 +107,49 @@ class RegistrySource:
     crawl: dict[str, Any] = field(default_factory=dict)
 
 
+# --- Data-access schema ------------------------------------------------------
+# Runtime concerns: given a vendor, how does an integration engineer actually
+# FETCH the historical / real-time data? What auth mechanisms are supported?
+# The `sources` block above is for DOCUMENTATION discovery; this block is for
+# the customer's production integration.
+
+AccessMethod = Literal[
+    "rest_api",           # HTTPS + JSON (most modern ACDs)
+    "soap_api",           # SOAP + XML with WSDL
+    "graphql_api",        # GraphQL endpoint
+    "file_export",        # scheduled CSV/JSON export, typically SFTP or S3
+    "database_direct",    # direct JDBC/ODBC read (older on-prem systems)
+    "webhook_push",       # vendor pushes events to our endpoint
+    "streaming",          # WebSocket / server-sent events
+]
+
+AuthMethod = Literal[
+    "api_key",                     # simple header / query param
+    "oauth2_client_credentials",   # machine-to-machine OAuth2
+    "oauth2_authorization_code",   # user-consent OAuth2
+    "basic_auth",                  # HTTP Basic username/password
+    "bearer_token",                # opaque bearer (often issued by a login endpoint)
+    "session_token",               # vendor-specific login → session cookie/token
+    "mtls",                        # mutual TLS with client certs
+    "aws_signature_v4",            # AWS SigV4 (for AWS-native vendors)
+    "iam_role",                    # AWS IAM role assumption
+    "sso_saml",                    # SAML-based SSO
+    "sshkey",                      # SSH key (for SFTP-based file exports)
+]
+
+
+@dataclass(frozen=True)
+class RegistryAccess:
+    """One way to reach a vendor's data at runtime."""
+    method: AccessMethod
+    description: str = ""
+    endpoint: str | None = None       # base URL or connection pattern
+    format: str | None = None         # json | xml | csv | soap_envelope
+    auth: tuple[AuthMethod, ...] = ()
+    docs: str | None = None           # vendor docs page for this method
+    notes: str = ""
+
+
 @dataclass
 class VendorRegistryEntry:
     slug: str
@@ -115,4 +158,5 @@ class VendorRegistryEntry:
     category: Literal["fixed_schema", "flow_configured"]
     description: str
     sources: list[RegistrySource]
+    access: list[RegistryAccess] = field(default_factory=list)
     version: dict[str, Any] = field(default_factory=dict)

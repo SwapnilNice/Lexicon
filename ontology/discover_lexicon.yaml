@@ -1,0 +1,175 @@
+# Vendor-agnostic keyword lexicon for the discovery pipeline.
+#
+# This file replaces what was previously hardcoded in the framework's Python
+# modules (semantic_tag.py, trap_detect.py). Moving these tokens to a data
+# file means:
+#   - framework code contains ZERO vendor-specific strings
+#   - adding a vendor doesn't require a code change; append to this file
+#   - lexicon evolution is a config-diff PR, not a source-diff PR
+#
+# Two sections:
+#   tag_keywords    — used by semantic_tag.py to tag each enriched field with
+#                     one or more canonical concept families
+#   canonical_target_map — used by trap_detect.py to normalize free-text
+#                     concept references (e.g. "holdtime" → "hold_time") to
+#                     the canonical concept slug
+
+tag_keywords:
+  # ---- Duration concepts ----------------------------------------------
+  talk_time_like:
+    - talk
+    - acdtime         # Avaya CMS
+    - ttalk           # Genesys Cloud
+    - converse
+
+  hold_time_like:
+    - hold
+    - held
+    - holdtime        # Avaya CMS
+    - theld           # Genesys Cloud
+    - park
+
+  acw_time_like:
+    - acw
+    - wrap
+    - wrapup
+    - aftercall
+    - after_call
+    - aftercontactwork    # Amazon Connect
+    - after_contact_work
+    - worktime            # Avaya
+    - tacw                # Genesys
+    - acwtime             # Avaya
+
+  queue_delay_time_like:
+    - delay
+    - wait
+    - answered
+    - ans
+    - anstime             # Avaya
+    - queuetime
+    - tanswered           # Genesys
+    - queue_time
+
+  ready_time_like:
+    - ready
+    - avail
+    - available
+    - availtime           # Avaya
+    - idle
+    - iavailtime          # Avaya
+    - tidle               # Genesys
+    - readytime
+
+  not_ready_time_like:
+    - notready
+    - not_ready
+    - aux
+    - auxtime             # Avaya
+    - tiauxtime           # Avaya
+    - away
+    - notresponding
+
+  login_time_like:
+    - login
+    - staff
+    - stafftime           # Avaya
+    - loggedin
+    - istafftime          # Avaya
+    - logintime
+    - tactive             # Genesys
+
+  internal_time_like:
+    - internal_time
+    - daacdtime           # Avaya (DA = direct-agent)
+    - tinternal           # Genesys
+    - internalhandletime
+
+  outbound_time_like:
+    - outbound_time
+    - oacdtime            # Avaya
+    - toutbound           # Genesys
+    - outboundhandletime
+
+  right_party_time_like:
+    - rpc_time
+    - righthandletime
+
+  # ---- Count concepts -------------------------------------------------
+  handled_total_like:
+    - handled
+    - acd
+    - acdcalls            # Avaya
+    - nhandled            # Genesys
+    - answered
+    - nanswered
+
+  handled_within_sl_like:
+    - acceptable          # Avaya
+    - within_sl
+    - withinsl
+    - servicelevel
+    - handled_sl
+    - sl_handled
+
+  abandoned_total_like:
+    - abandoned
+    - abandon
+    - abn
+    - abncalls            # Avaya
+    - nabandoned
+
+  abandoned_within_sl_like:
+    - slvlabns            # Avaya
+    - sl_abandoned
+    - within_sl_abandoned
+
+  contacts_active_like:
+    - contactsactive      # Avaya
+    - active
+    - carryover
+
+  internal_count_like:
+    - internal_contacts
+    - internalcontacts
+    - daacdcalls          # Avaya
+    - ninternal
+
+  outbound_count_like:
+    - outbound_contacts
+    - outboundcontacts
+    - oacdcalls           # Avaya
+    - noutbound
+
+  # ---- Key concepts ---------------------------------------------------
+  queue_key_like:
+    - csq
+    - split               # Avaya
+    - skill
+    - queueid             # Genesys
+    - queue_id
+    - vdn
+    - gate
+
+  agent_key_like:
+    - logid               # Avaya
+    - userid
+    - agent
+    - extension
+    - agentid
+
+
+# Trap-detection normalization. When a "does not include X" phrase is found,
+# X is normalized to a canonical concept slug via this map. Keys are vendor
+# tokens (or common English words); values are canonical slugs.
+canonical_target_map:
+  hold: hold_time
+  holdtime: hold_time
+  acw: acw_time
+  wrapup: acw_time
+  wrap: acw_time
+  wrap-up: acw_time
+  after-call: acw_time
+  aftercall: acw_time
+  talk: talk_time
+  talktime: talk_time

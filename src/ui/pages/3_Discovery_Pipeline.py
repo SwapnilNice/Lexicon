@@ -163,6 +163,12 @@ if run:
             "name": resolve.entry.name,
             "description": resolve.entry.description,
             "blueprint_paths": [str(p) for p in blueprints],
+            "access": [
+                {"method": a.method, "description": a.description,
+                 "endpoint": a.endpoint, "format": a.format,
+                 "auth": list(a.auth), "docs": a.docs, "notes": a.notes}
+                for a in resolve.entry.access
+            ],
         }
     elif resolve is not None:
         with st.spinner(f"Running discovery pipeline for `{resolve.entry.slug}`…"):
@@ -183,6 +189,12 @@ if run:
                     "catalog_path": str(r.catalog_path),
                     "proposed_path": str(r.proposed_path),
                     "report_path":  str(r.report_path),
+                    "access": [
+                        {"method": a.method, "description": a.description,
+                         "endpoint": a.endpoint, "format": a.format,
+                         "auth": list(a.auth), "docs": a.docs, "notes": a.notes}
+                        for a in resolve.entry.access
+                    ],
                 }
             except Exception as e:  # noqa: BLE001
                 import traceback
@@ -190,6 +202,48 @@ if run:
                     f"Pipeline failed: {e}\n\n"
                     f"```\n{traceback.format_exc()}\n```"
                 )
+
+# ---------------------------------------------------------------------------
+# Data-access helper — renders how to fetch a vendor's data at runtime.
+# ---------------------------------------------------------------------------
+def render_access_info(access: list[dict]) -> None:
+    """Show the vendor's data-access methods + auth in an expander.
+
+    Displays: for each connection method the vendor offers, the transport
+    (REST/SOAP/file/DB/streaming), the supported auth mechanisms, endpoint
+    pattern, and docs link. This is what an integration engineer needs to
+    actually connect to the ACD after the mapping is approved."""
+    if not access:
+        st.warning(
+            "No `access:` block in this vendor's registry entry. The registry "
+            "should describe how to fetch runtime data (REST API endpoint, "
+            "file export, database connection, etc.). Add one to "
+            "`ontology/registry/<slug>.yaml`."
+        )
+        return
+    with st.expander(f"🔌 How to fetch data from this vendor  ({len(access)} method(s))", expanded=True):
+        st.caption(
+            "Runtime integration options for this ACD. Choose one based on "
+            "your NICE deployment's requirements (real-time vs batch, "
+            "auth infrastructure you already have, volume, etc.)."
+        )
+        rows = []
+        for a in access:
+            rows.append({
+                "Method": a["method"],
+                "Description": (a["description"] or "").strip()[:120],
+                "Endpoint / Connection": a["endpoint"] or "—",
+                "Format": a["format"] or "—",
+                "Auth Methods": ", ".join(a["auth"]) if a["auth"] else "—",
+            })
+        st.dataframe(rows, use_container_width=True, hide_index=True)
+        # Docs links (rendered separately so they're clickable)
+        for a in access:
+            if a["docs"]:
+                st.markdown(f"- **{a['method']}** docs: [{a['docs']}]({a['docs']})")
+            if a["notes"]:
+                st.caption(f"↳ {a['method']}: {a['notes']}")
+
 
 # ---------------------------------------------------------------------------
 # Result display
@@ -208,6 +262,9 @@ if fc:
         f"**Flow Blueprint** capability instead."
     )
     st.caption(fc["description"])
+
+    # Runtime data-access info (how to connect to this vendor)
+    render_access_info(fc.get("access") or [])
 
     blueprint_paths = [Path(p) for p in fc["blueprint_paths"]]
     if not blueprint_paths:
@@ -354,6 +411,9 @@ c1.metric("Vendor slug", last["slug"])
 c2.metric("Resolved via", last["resolved_via"])
 c3.metric("Fields found", f"{n_found}/{n_fields}")
 c4.metric("Coverage", f"{success_rate:.0f}%")
+
+# Runtime data-access info (how to connect to this vendor)
+render_access_info(last.get("access") or [])
 
 tab_report, tab_proposed, tab_catalog, tab_registry = st.tabs(
     ["📋 Coverage Report", "🗺 Proposed Mapping", "📇 Rich Catalog", "🌳 Registry Entry"]

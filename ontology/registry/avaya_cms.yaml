@@ -20,6 +20,28 @@ sources:
       include_paths:
         - "/DatabaseInfoDatabaseTables/"
 
+access:
+  # How to fetch the data at runtime. `sources:` above is for doc discovery;
+  # this section is what an integration engineer needs to actually connect.
+  - method: database_direct
+    description: >
+      Direct read from the Avaya CMS historical Informix database. Standard
+      NICE-CMS integration path. Requires network access to the CMS server
+      and the Informix client driver.
+    endpoint: "informix://<cms-host>:<port>/cms_hist"
+    format: "sql_rows"
+    auth: [basic_auth]
+    docs: "https://documentation.avaya.com/en-us/home/bundle/cms/AvayaCMSDBItemsCalculations_r21/"
+    notes: "Basic auth uses the Informix DB user (not the OS user)."
+
+  - method: file_export
+    description: >
+      Scheduled CSV exports from CMS Supervisor's Report Designer. Any
+      historical report can be run and pushed to a delivery target.
+    format: "csv"
+    auth: [sshkey, basic_auth]
+    notes: "Delivery is customer-configured — SFTP is the standard integration path."
+
 version:
   system_version: "R21"
   last_verified: "2026-08-09"

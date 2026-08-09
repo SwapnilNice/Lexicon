@@ -79,7 +79,9 @@ def _pdf_to_markdown(body: bytes) -> str:
     patterns = [
         # "Field Name: description" or "Field Name - description" or "Field Name – description" (en dash)
         re.compile(r"^([A-Z][A-Za-z0-9 _./&-]{2,60})\s*[:\-–]\s+(.{20,})$"),
-        # "Field Name (subtype description) rest of description"  ← Five9 style
+        # "Field Name (subtype description) rest of description"
+        # (a common pattern in enterprise vendor PDFs — name + parenthesized
+        # classifier + prose)
         re.compile(r"^([A-Z][A-Za-z ]{2,50})\s*\(([^)]{3,60})\)\s+(.{20,})$"),
         # "AVG_HANDLE_TIME  description" (SNAKE_CASE + gap + text)
         re.compile(r"^([A-Z][A-Z0-9_]{4,50})\s{2,}(.{20,})$"),

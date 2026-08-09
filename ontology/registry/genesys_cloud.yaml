@@ -20,6 +20,26 @@ sources:
     role: primary
     url: https://api.mypurecloud.com/api/v2/docs/swagger.json
 
+access:
+  - method: rest_api
+    description: >
+      Analytics Conversation Aggregates endpoint returns historical metrics
+      aggregated by queue, user, or media type over any time range.
+    endpoint: "POST https://api.<region>.pure.cloud/api/v2/analytics/conversations/aggregates/query"
+    format: "json"
+    auth: [oauth2_client_credentials]
+    docs: "https://developer.genesys.cloud/analyticsdatamanagement/analytics/detail/aggregations"
+    notes: "Region-specific base URL — use the region your org is provisioned in (mypurecloud.com, mypurecloud.ie, ...)."
+
+  - method: webhook_push
+    description: >
+      Notification service pushes real-time analytics events over WebSocket
+      channels. Useful for near-real-time integrations rather than historical.
+    format: "json"
+    auth: [oauth2_client_credentials, bearer_token]
+    docs: "https://developer.genesys.cloud/notificationsalerts/notifications/"
+    notes: "Not typically used for WFM historical intervals — REST aggregates are the standard path."
+
 version:
   system_version: "2025.10"
   last_verified: "2026-08-09"
