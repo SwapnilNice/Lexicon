@@ -1,0 +1,47 @@
+# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
+# have an expert review. AI proposes, harness verifies, human ratifies.
+meta:
+  vendor: AmazonConnect
+  report: agentqueue
+  status: proposed
+  engine: reference
+fields:
+  QueueValue: QUEUE_ANSWER_TIME
+  AgentValue: ACTIVE_AI_AGENTS
+  Handled: PROACTIVE_INTENTS_ANSWERED
+  HandleTime: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
+  HoldTime: INTERACTION_AND_HOLD_TIME
+  WorkTime: AFTER_CONTACT_WORK_TIME
+proposals:
+  QueueValue:
+    proposed: QUEUE_ANSWER_TIME
+    confidence: 0.85
+    rationale: reused pattern QueueValue=key['key'] learned from approved vendors
+    needs_review: false
+  AgentValue:
+    proposed: ACTIVE_AI_AGENTS
+    confidence: 0.85
+    rationale: reused pattern AgentValue=key['agent_key'] learned from approved vendors
+    needs_review: false
+  Handled:
+    proposed: PROACTIVE_INTENTS_ANSWERED
+    confidence: 0.85
+    rationale: reused pattern Handled=single['handled_total'] learned from approved
+      vendors
+    needs_review: false
+  HandleTime:
+    proposed: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
+    confidence: 0.85
+    rationale: reused pattern HandleTime=sum['talk', 'hold'] learned from approved
+      vendors
+    needs_review: false
+  HoldTime:
+    proposed: INTERACTION_AND_HOLD_TIME
+    confidence: 0.85
+    rationale: reused pattern HoldTime=single['hold'] learned from approved vendors
+    needs_review: false
+  WorkTime:
+    proposed: AFTER_CONTACT_WORK_TIME
+    confidence: 0.85
+    rationale: reused pattern WorkTime=single['acw'] learned from approved vendors
+    needs_review: false

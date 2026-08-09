@@ -1,0 +1,19 @@
+# APPROVED executable mapping — Avaya hsplit -> canonical Queue.
+# Each canonical field = a formula over Avaya columns. Units/order come from
+# canonical_wfm.yaml, so this file only states the arithmetic.
+# This is the human-ratified source of truth the engine runs.
+meta:
+  vendor: Avaya
+  report: queue
+  status: approved            # approved by expert (was AI-proposed, then reviewed)
+fields:
+  QueueValue:      "split"
+  AbandonedShort:  "slvlabns"
+  AbandonedLong:   "abncalls - slvlabns"
+  HandledShort:    "acceptable"
+  HandledLong:     "acdcalls - acceptable"
+  HandleTime:      "acdtime + holdtime"     # acdtime EXCLUDES hold -> add holdtime; no ACW
+  HoldTime:        "holdtime"
+  WorkTime:        "acwtime"
+  QueueDelayTime:  "anstime"
+  ContactsActive:  "contactsactive"

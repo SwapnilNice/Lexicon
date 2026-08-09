@@ -1,0 +1,34 @@
+# "Discovered" Avaya hsplit field catalog — what step 1 (discovery) produces by
+# reading the vendor docs (CMS DB Items & Calculations R21). Name + description.
+# This is the INPUT to the auto-mapper; it does NOT contain the answer.
+meta:
+  vendor: Avaya
+  report: queue
+  table: hsplit
+  source:                     # where discovery reads the vendor's meaning from
+    - name: "Avaya CMS DB Items & Calculations R21 — Split/Skill database items"
+      url: "https://documentation.avaya.com/en-us/home/bundle/cms/AvayaCMSDBItemsCalculations_r21/DatabaseInfoDatabaseTables/CMSDatabaseTableItems/DatabaseInfoSplitskillDatabaseItems.html"
+    - name: "Avaya CMS DB Items & Calculations R21 (PDF manual)"
+      ref: "avayacmsdbitemscalculationsr21.pdf"
+fields:
+  split:          "Split or skill number identifying the queue."
+  acdcalls:       "Number of ACD calls answered by an agent in this split."
+  acceptable:     "ACD calls answered within the acceptable service level."
+  abncalls:       "Number of calls abandoned while in queue or ringing."
+  slvlabns:       "Calls abandoned within the service level threshold."
+  acdtime:        "Talk time of all ACD calls. Does not include hold time."
+  holdtime:       "Time ACD callers spent on hold."
+  acwtime:        "After-call work (wrap-up) time associated with ACD calls."
+  anstime:        "Time callers spent in queue or ringing before an agent answered."
+  abntime:        "Time callers waited before abandoning."
+  callsoffered:   "Total calls offered to the split during the interval."
+  contactsactive: "Active contacts: calls answered this interval that arrived in a previous interval."
+  # --- hagent (agent) table fields, used for Agent-Queue and Agent-System reports ---
+  logid:          "Agent login ID."
+  da_acdcalls:    "Direct-agent (agent-to-agent) ACD calls answered by this agent."
+  da_acdtime:     "Talk time of direct-agent ACD calls, in seconds."
+  o_acdcalls:     "Outbound ACD calls placed by this agent (adjunct/agent-initiated)."
+  o_acdtime:      "Talk time of outbound ACD calls, in seconds."
+  i_availtime:    "Time the agent was available/ready in the interval, in seconds."
+  ti_auxtime:     "Time the agent spent in AUX (not-ready) across all splits, in seconds."
+  i_stafftime:    "Time the agent was logged in (staffed) during the interval, in seconds."

@@ -1,0 +1,18 @@
+# APPROVED executable mapping — Genesys Cloud -> canonical Queue.
+# Genesys durations are milliseconds -> divide by 1000. tHandle INCLUDES ACW,
+# so HandleTime uses (tTalk + tHeld), NOT tHandle.
+meta:
+  vendor: Genesys
+  report: queue
+  status: approved
+fields:
+  QueueValue:      "queueId"
+  AbandonedShort:  "nAbandonedWithinSL"
+  AbandonedLong:   "nAbandoned - nAbandonedWithinSL"
+  HandledShort:    "nHandledWithinSL"
+  HandledLong:     "nHandled - nHandledWithinSL"
+  HandleTime:      "(tTalk_ms + tHeld_ms) / 1000"    # NOT tHandle (includes ACW); convert ms->s
+  HoldTime:        "tHeld_ms / 1000"
+  WorkTime:        "tAcw_ms / 1000"
+  QueueDelayTime:  "tAnswered_ms / 1000"
+  ContactsActive:  "contactsActive"

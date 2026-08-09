@@ -1,0 +1,341 @@
+# DISCOVERED catalog (step 1). Extracted from Amazon Connect metric-definitions.md.
+# Field names are the GetMetricDataV2 API identifiers; descriptions include
+# the human-facing metric name and a one-line summary.
+meta:
+  vendor: AmazonConnect
+  report: queue
+  source:
+  - name: Amazon Connect Administrator Guide — Metric definitions
+    url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.html
+fields:
+  ABANDONMENT_RATE: 'Abandonment rate: This metric measures the percentage of abandoned contacts.'
+  ACTIVE_AI_AGENTS: 'Active AI Agents: This metric measures the total number of unique AI Agents, where each AI Agent is identified
+    by its unique combination of Name and Version.'
+  AGENT_SCHEDULE_ADHERENCE: 'Adherence: This metric is available in AWS Regions only where Forecasting, capacity planning,
+    and scheduling is available. [historical only]'
+  AGENT_ADHERENT_TIME: 'Adherent time: This metric is available in AWS Regions only where Forecasting, capacity planning,
+    and scheduling is available. [historical only]'
+  AFTER_CONTACT_WORK_TIME: 'After contact work time: This metric measures the total time that an agent spent doing ACW for
+    a contact.'
+  SUM_CONNECTING_TIME_AGENT: 'Agent outbound connecting time: This metric measures the total time between when an outbound
+    contact is initiated by Connect Customer reserving the agent for the contact, and the agent is connected. [historical
+    only]'
+  AVG_CONTACT_FIRST_RESPONSE_TIME_AGENT: 'Agent average contact first response wait time: This metric measures the average
+    time (in seconds) elapsed from the chat session enqueue timestamp to the timestamp of the first agent reply to the customer.'
+  SUM_IDLE_TIME_AGENT: 'Agent idle time: After the agent sets their status in the CCP to **Available**, this metric measures
+    is the amount of time they weren''t handling contacts \+ any time their contacts were in an Error state. [historical only]'
+  SUM_NON_PRODUCTIVE_TIME_AGENT: 'Agent non-productive time: This metric measures the total time that agents spent in a custom
+    status. [historical only]'
+  CONTACTS_MISSED: 'Agent non-response: This metric counts the contacts routed to an agent but not answered by that agent,
+    including contacts abandoned by the customer.'
+  AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS: 'Agent non-response without customer abandons: This metric counts the voice
+    contacts routed to an agent but not answered by that agent, excluding contacts abandoned by the customer. [historical
+    only]'
+  SUM_CONTACT_TIME_AGENT: 'Agent contact time: This metric measures the total time that an agent spent on a contact, including
+    Customer Hold Time and After Contact Work Time. [historical only]'
+  AGENTS_ON_CONTACT: 'Agents on contact: This metric counts agents currently handling at least one contact. [real-time only]'
+  PERCENT_TALK_TIME_AGENT: 'Agent talk time percent: This metric measures the talk time by an agent in a voice conversation
+    as a percent of the total conversation duration. [historical only]'
+  AI_HANDOFFS: 'AI Handoffs: This metric measures the total count of contacts handled by AI Agents that escalated to human
+    agents. [historical only]'
+  AI_HANDOFF_RATE: 'AI Handoff Rate: This metric measures the percentage of contacts handled by AI Agents that had escalation
+    to human agents or additional support.'
+  AI_AGENT_INVOCATIONS: 'AI Agent Invocations: This metric measures the total count of AI Agents invocations across all AI-Agents
+    per instance.'
+  AI_AGENT_INVOCATION_SUCCESS: 'AI Agent Invocation Success: This metric measures the number of AI Agents invocations that
+    executed successfully without technical failures such as API errors, timeouts, or system issues.'
+  AI_AGENT_INVOCATION_SUCCESS_RATE: 'AI Agent Invocation Success Rate: This metric measures the percentage of AI Agents invocations
+    that executed successfully without technical failures.'
+  AI_AGENT_RESPONSE_HELPFUL: 'AI Agent Response Helpful: This metric measures the count of AI suggestions rated as helpful
+    with a thumbs-up.'
+  AI_AGENT_RESPONSE_NOT_HELPFUL: 'AI Agent Response Not Helpful: This metric measures the count of AI suggestions rated as
+    unhelpful with a thumbs-down.'
+  AI_RESPONSE_COMPLETION_RATE: 'AI Response Completion Rate: This metric measures the percentage of AI sessions that successfully
+    responded to incoming customer requests.'
+  AI_INVOLVED_CONTACTS: 'AI Involved Contacts: This metric measures the total count of customer contacts where AI Agents were
+    involved, either providing self-service automation or assisting human agents in resolving customer inquiries.'
+  AI_PROMPT_INVOCATION_SUCCESS: 'AI Prompt Invocation Success: This metric measures the number of AI Prompts invocations that
+    executed successfully without errors.'
+  AI_PROMPT_INVOCATION_SUCCESS_RATE: 'AI Prompt Invocation Success Rate: This metric measures the number of AI Prompts invocations
+    that executed successfully without errors.'
+  AI_PROMPT_INVOCATIONS: 'AI Prompt Invocations: This metric measures the total count of AI Prompts invocations.'
+  AI_TOOL_INVOCATION_SUCCESS: 'AI Tool Invocation Success: This metric measures the total count of AI Tools invocations that
+    executed successfuly.'
+  AI_TOOL_INVOCATION_SUCCESS_RATE: 'AI Tool Invocation Success Rate: This metric measures the percentage of AI Tools invocations.'
+  AI_TOOL_INVOCATIONS: 'AI Tool Invocations: This metric measures the percentage of AI Tools invocations.'
+  AI_TOOL_PARAMETER_ACCURACY: 'AI Tool Parameter Accuracy: This metric measures the rate of tool invocations where AI Agents
+    provided the correct parameters.'
+  AI_TOOL_SELECTION_ACCURACY: 'AI Tool Selection Accuracy: This metric measures the rate of correct tool selections by AI
+    Agents.'
+  AI_TOOL_UTILIZATION_ACCURACY: 'AI Tool Use Accuracy: This metric measures the rate of correct tool use by AI Agents, including
+    proper parameters and selection.'
+  AVG_AI_AGENT_CONVERSATION_TURNS: 'Average AI Agent Conversation Turns: This metric measures the average number of conversation
+    turns that AI Agents took to reach an outcome.'
+  AVG_AI_CONVERSATION_TURNS: 'Average AI Conversation Turns: This metric measures the average number of conversation turns
+    across all AI involved contacts.'
+  AVG_AI_PROMPT_INVOCATION_LATENCY: 'Average AI Prompt Invocation Latency: This metric measures the average invocation latency
+    of AI Prompts in milliseconds.'
+  AVG_AI_TOOL_INVOCATION_LATENCY: 'Average AI Tool Invocation Latency: This metric measures the average invocation latency
+    of AI Tools in milliseconds.'
+  COMPLETENESS_SCORE: 'Completeness Score: This metric measures the proportion of sessions where the Orchestration AI Agent
+    responses fully address all parts of customer requests rather than providing partial or incomplete answers.'
+  FAITHFULNESS_SCORE: 'Faithfulness Score: This metric measures the proportion of sessions where the Orchestration AI Agent
+    responses remain faithful to the conversational context, including messages and tool call results.'
+  GOAL_SUCCESS_RATE: 'Goal Success Rate: This metric measures the proportion of sessions where the Orchestration AI Agent
+    successfully resolved customer issues.'
+  KNOWLEDGE_CONTENT_REFERENCES: 'Knowledge Content References: This metric measures the count of knowledge content articles
+    referenced by AI Agents.'
+  PROACTIVE_INTENTS_ANSWERED: 'Proactive Intents Answered: This metric measures the number of proactive intents (customer
+    queries) that were successfully answered by AI Agents during AI sessions.'
+  PROACTIVE_INTENTS_DETECTED: 'Proactive Intents Detected: This metric measures the number of proactive intents (customer
+    queries) detected during AI sessions, particularly for Agent Assistance use cases.'
+  PROACTIVE_INTENTS_ENGAGED: 'Proactive Intents Engaged: This metric measures the number of proactive intents (customer queries)
+    detected during AI sessions, particularly for Agent Assistance use cases.'
+  PROACTIVE_INTENT_ENGAGEMENT_RATE: 'Proactive Intent Engagement Rate: This metric measures the percentage of detected proactive
+    intents that were clicked or engaged with by human agents.'
+  PROACTIVE_INTENT_RESPONSE_RATE: 'Proactive Intent Response Rate: This metric measures the percentage of detected proactive
+    intents that were clicked or engaged with by human agents.'
+  CONTACTS_CREATED: 'Contacts created: This metric counts the contacts in a queue.'
+  API_CONTACTS_HANDLED: 'API contacts handled: This metric counts the contacts that were initiated using an Connect Customer
+    API operation, such as StartOutboundVoiceContact, and handled by an agent.'
+  SLOTS_AVAILABLE: 'Availability: This metric shows the current number of slots that are available for each agent for routing
+    new contacts. [real-time only]'
+  AGENTS_AVAILABLE: 'Available: This metric measures the number of agents who can take an inbound contact. [real-time only]'
+  AVG_ACTIVE_TIME: 'Average active time: This metric measures the average time an agent spends on a customer interaction,
+    including Agent interaction time, Customer hold time, and After contact work (ACW) time.'
+  AVG_AFTER_CONTACT_WORK_TIME: 'Average outbound after contact work time: This metric measures the average time that agents
+    spent doing After Contact Work (ACW) for an outbound contact. [historical only]'
+  AVG_AGENT_CONNECTING_TIME: 'Average agent outbound connecting time: This metric measures the average time between when an
+    outbound contact is initiated by Connect Customer reserving the agent for the contact, and the agent is connected.'
+  AVG_AGENT_CONCURRENCY: 'Average agent concurrency: This metric measures the ratio of an agent''s concurrent handle time
+    to their total handle and idle time.'
+  AVG_FIRST_RESPONSE_TIME_AGENT: 'Average agent first response time: This metric measures the average time (in seconds) taken
+    by an agent to respond after obtaining a chat contact.'
+  AVG_GREETING_TIME_AGENT: 'Average agent greeting time: This metric provides the average first response time of agents on
+    chat, indicating how quickly they engage with customers after joining the chat. [historical only]'
+  INTERACTION_AND_HOLD_TIME: 'Average agent interaction and customer hold time: This metric measures the average time an agent
+    spends on a customer interaction, including Agent interaction time and Customer hold time.'
+  INTERACTION_TIME: 'Average agent interaction time: This metric measures the average time that agents interacted with customers
+    during inbound and outbound contacts.'
+  AVG_INTERRUPTIONS_AGENT: 'Average agent interruptions: This metric quantifies the average frequency of agent interruptions
+    during customer interactions. [historical only]'
+  AVG_INTERRUPTION_TIME_AGENT: 'Average agent interruption time: This metric measures the average of total agent interruption
+    time while talking to a contact. [historical only]'
+  AVG_MESSAGE_LENGTH_AGENT: 'Average agent message length: This metric measures the average length (in characters) of messages
+    sent by agents.'
+  AVG_MESSAGES_AGENT: 'Average agent messages: This metric measures the average number of messages sent by agent across contacts.'
+  AVG_AGENT_PAUSE_TIME: 'Average agent pause time: This metric calculates the average time that an agent paused a contact
+    after the contact was connected to the agent during inbound and outbound contacts.'
+  AVG_RESPONSE_TIME_AGENT: 'Average agent response time: This metric measures the average time (in seconds) taken by agents
+    to respond to customer messages.'
+  AVG_TALK_TIME_AGENT: 'Average agent talk time: This metric measures the average time that was spent talking in a conversation
+    by an agent. [historical only]'
+  AVG_BOT_CONVERSATION_TIME: 'Average bot conversation time: This metric measures the average duration of completed conversations
+    for which the invoking resource (flow or flow module) started between the specified start and end time.'
+  AVG_BOT_CONVERSATION_TURNS: 'Average bot conversation turns: This metric provides the average number of turns for completed
+    conversations for which the invoking resource (flow or flow module) started between the specified start and end time.'
+  AVG_MESSAGES_BOT: 'Average bot messages: This metric measures the average number of messages sent by bots across contacts.'
+  AVG_CASE_RESOLUTION_TIME: 'Average case resolution time: This metric measures the average amount of time spent to resolve
+    a case during the provided time interval. [historical only]'
+  AVG_CONTACT_DURATION: 'Average contact duration: This metric measures the average time a contact spends from the contact
+    initiation timestamp to disconnect timestamp. [historical only]'
+  AVG_CASE_RELATED_CONTACTS: 'Average contacts per case: This metric measures the average number of contacts (calls, chat,
+    tasks, and email) for cases created during the provided time interval. [historical only]'
+  AVG_CONVERSATION_CLOSE_TIME: 'Average conversation close time: This metric measures the average time elapsed (in seconds)
+    since last customer message before the contact is disconnected.'
+  AVG_CONVERSATION_DURATION: 'Average conversation duration: This metric measures the average conversation duration of voice
+    contacts with agents. [historical only]'
+  AVG_HOLD_TIME: 'Average customer hold time: This metric measures the average time that customers spent on hold after being
+    connected to an agent.'
+  AVG_HOLD_TIME_ALL_CONTACTS: 'Average customer hold time all contacts: This metric measures the average hold time for all
+    contacts handled by an agent. [historical only]'
+  AVG_MESSAGE_LENGTH_CUSTOMER: 'Average customer message length: This metric measures the average length (in characters) of
+    messages sent by customers.'
+  AVG_MESSAGES_CUSTOMER: 'Average customer messages: This metric measures the average number of messages sent by customers
+    in a contact.'
+  AVG_RESPONSE_TIME_CUSTOMER: 'Average customer response time: This metric measures the average time (in seconds) from an
+    agent''s first message in a turn until the customer responds, even if the agent sends multiple messages before receiving
+    a customer reply.'
+  AVG_TALK_TIME_CUSTOMER: 'Average customer talk time: This metric measures the average time that was spent talking in a conversation
+    by a customer. [historical only]'
+  AVG_DIALS_PER_MINUTE: 'Average dials per minute: This metric measures the average number of outbound campaign dials per
+    minute for the specified start time and end time.'
+  AVG_EVALUATION_SCORE: 'Average evaluation score: This metric provides the average evaluation score for all submitted evaluations.'
+  AVG_FLOW_TIME: 'Average flow time: This metric measures the average duration of flow for the specified start time and end
+    time.'
+  HANDLE_TIME: 'Average handle time: This metric measures the average time, from start to finish, that a contact is connected
+    with an agent (average handle time).'
+  AVG_HOLDS: 'Average holds: This metric measures the average number of times voice contacts were put on hold while interacting
+    with an agent. [historical only]'
+  AVG_MESSAGES: 'Average messages: This metric measures the average number of messages exchanged per contact.'
+  AVG_NON_TALK_TIME: 'Average non-talk time: This metric provides the average of total non-talk time in a voice conversation.
+    [historical only]'
+  AVG_INTERACTION_TIME: 'Average outbound agent interaction time: This metric measures the average time that agents spent
+    interacting with a customer during an outbound contact. [historical only]'
+  ABANDON_TIME: 'Average queue abandon time: This metric measures the average time that contacts waited in the queue before
+    being abandoned.'
+  AVG_ABANDON_TIME: 'Average queue abandon time - customer first callback: This metric measures the average time that callback
+    contacts, who were called for their first callback, waited in the queue before abandoning the call.'
+  QUEUE_ANSWER_TIME: 'Average queue answer time (enqueue timestamp): This metric measures the average time that contacts waited
+    in the queue before being answered by an agent.'
+  AVG_QUEUE_ANSWER_TIME_CUSTOMER_FIRST_CALLBACK: 'Average queue answer time - customer first callback: This metric measures
+    the average time that callback contacts were queued for their first callback before being answered by an agent.'
+  AVG_QUEUE_ANSWER_TIME: 'Average speed of answer - customer first callback dialed: This metric measures the average time
+    that callback contacts, who were called for their first callback, waited in the queue before their call was answered by
+    an agent.'
+  AVG_TALK_TIME: 'Average talk time: This metric measures the average time that was spent talking during a voice contact across
+    either the customer or the agent. [historical only]'
+  AVG_WAIT_TIME_AFTER_CUSTOMER_FIRST_CALLBACK_CONNECTION: 'Average wait time after customer connection - customer first callback:
+    This metric measures the average duration of customer''s total wait time to be connected to an agent after they answer
+    their first callback.'
+  AVG_WAIT_TIME_AFTER_CUSTOMER_CONNECTION: 'Average wait time after customer connection: This metric measures the average
+    duration of total wait time by the customer after they answer the outbound call through the Connect Customer dialer.'
+  AVG_WEIGHTED_EVALUATION_SCORE: 'Average weighted evaluation score: This metric provides the average weighted evaluation
+    score for all submitted evaluations.'
+  BOT_CONVERSATIONS_COMPLETED: 'Bot conversations completed: This metric provides the count of completed conversations for
+    which the invoking resource (flow or flow module) started between the specified start and end time.'
+  BOT_INTENTS_COMPLETED: 'Bot intents completed: This metric provides the count of completed intents.'
+  SUM_RETRY_CALLBACK_ATTEMPTS: 'Callback attempts: This metric represents the number of contacts where a callback was attempted,
+    but the customer did not answer the call.'
+  CALLBACK_CONTACTS_HANDLED: 'Callback contacts handled: This metric counts the contacts that were initiated from a queued
+    callback and handled by an agent.'
+  CAMPAIGN_CONTACTS_ABANDONED_AFTER_X: 'Campaign contacts abandoned after X: This metric counts the outbound campaign calls
+    that were connected to a live customer but did not get connected to an agent within X seconds.'
+  CAMPAIGN_CONTACTS_ABANDONED_AFTER_X_RATE: 'Campaign contacts abandoned after X rate: This metric measures the percentage
+    of outbound campaign calls that were connected to a live customer but did not get connected to an agent within X seconds
+    divided by the count of contacts connected to a live customer in an outbound campaign. The possible values for X are from
+    1 to 604800 inclusive.'
+  CAMPAIGN_INTERACTIONS: 'Campaign interactions: This metric counts the outbound campaign interactions after a successful
+    delivery attempt.'
+  CAMPAIGN_PROGRESS_RATE: 'Campaign progress rate: This metric measures the percentage of outbound campaign recipients attempted
+    for delivery, out of the total number of recipients targeted.'
+  CAMPAIGN_SEND_ATTEMPTS: 'Campaign send attempts: This metric counts the outbound campaign send requests sent by Connect
+    Customer for delivery.'
+  CAMPAIGN_SEND_EXCLUSIONS: 'Campaign send exclusions: This metric measures the count of outbound campaign send attempts that
+    were excluded from the targeted segment during a campaign execution.'
+  CASES_CREATED: 'Cases created: This metric counts all the cases created. [historical only]'
+  REOPENED_CASE_ACTIONS: 'Cases reopened: This metric measures the number of times cases have been reopened. [historical only]'
+  RESOLVED_CASE_ACTIONS: 'Cases resolved: This metric measures the number of times cases have been resolved. [historical only]'
+  PERCENT_CASES_FIRST_CONTACT_RESOLVED: 'Cases resolved on first contact: This metric measures the percent of cases that were
+    resolved on the first contact (only including calls, chats, or email). [historical only]'
+  SUM_CONTACT_FLOW_TIME: 'Contact flow time: This metric measures the total time a contact spent in a flow. [historical only]'
+  SUM_HANDLE_TIME: 'Contact handle time: This metric measures total time that an agent spent on contacts, including Customer
+    Hold Time and After contact work time. [historical only]'
+  CONTACTS_ABANDONED: 'Contacts abandoned - customer first callback: This metric counts the number of contacts that were dialed
+    for their first callback, but were disconnected by the customer while waiting in the queue.'
+  SUM_CONTACTS_ABANDONED_IN_X: 'Contacts abandoned in *X* seconds: This metric counts the queued contacts disconnected without
+    being connected to an agent for 0 to *X* seconds.'
+  CONTACTS_AGENT_HUNG_UP_FIRST: 'Contacts agent hung up first: This metric counts the contacts disconnected where the agent
+    disconnected before the customer.'
+  SUM_CONTACTS_ANSWERED_IN_X: 'Contacts answered in X seconds: This metric counts the contacts that were answered by an agent
+    between 0 and X seconds of being placed in the queue, based on the value of EnqueueTimestamp.'
+  CONTACTS_CONSULTED: 'Contacts consulted: Deprecated May 2019.'
+  SUM_CONTACTS_DISCONNECTED: 'Contacts disconnected: This metric counts the number of contacts that were disconnected by the
+    customer while waiting in the queue. [historical only]'
+  CONTACTS_HANDLED: 'Contacts handled - customer first callback: This metric counts the contacts handled by an agent for callback
+    customers who were dialed for their first callback.'
+  CONTACTS_HANDLED_CONNECTED_TO_AGENT_TIME: 'Contacts handled (connected to the agent timestamp): This metric counts the contacts
+    that were connected to an agent, updated as soon as a contact is connected to an agent. [historical only]'
+  CONTACTS_HANDLED_INCOMING: 'Contacts handled incoming: This metric counts the incoming contacts that handled by an agent,
+    including inbound contacts and transferred contacts, during the specified time range.'
+  CONTACTS_HANDLED_OUTBOUND: 'Contacts handled outbound: This metric counts the outbound contacts that were handled by an
+    agent.'
+  CONTACTS_ON_HOLD_AGENT_DISCONNECT: 'Contacts hold agent disconnect: This metric counts the contacts that were disconnected
+    by the agent while the customer was on hold. [historical only]'
+  CONTACTS_ON_HOLD_CUSTOMER_DISCONNECT: 'Contacts hold customer disconnect: This metric counts the contacts that were disconnected
+    by the customer while the customer was on hold. [historical only]'
+  CONTACTS_HOLD_ABANDONS: 'Contacts hold disconnect: This metric counts the contacts that disconnected while the customer
+    was on hold.'
+  CONTACTS_IN_QUEUE: 'Contacts in queue: This metric counts the contacts currently in the queue. [real-time only]'
+  CONTACTS_PUT_ON_HOLD: 'Contacts put on hold: This metric counts the contacts put on hold by an agent one or more times.
+    [historical only]'
+  CONTACTS_QUEUED: 'Contacts queued: This metric counts the contacts placed in the queue.'
+  CONTACTS_QUEUED_BY_ENQUEUE: 'Contacts queued (enqueue timestamp): This metric counts the contacts placed in the queue, updated
+    as soon as a contact is enqueued. [historical only]'
+  CONTACTS_REMOVED_FROM_QUEUE_IN_X: 'Contacts removed from queue in X seconds: This metric counts the contacts removed from
+    the queue between 0 and X after being added to it.'
+  CONTACTS_RESOLVED_IN_X: 'Contacts resolved in X seconds: This metric provides the count of contacts that have a resolution
+    duration between 0 and X seconds after being initiated based on InitiationTimestamp. [historical only]'
+  CONTACTS_TRANSFERRED_IN: 'Contacts transferred in: This metric counts the contacts transferred in from queue to queue, and
+    transferred in by an agent using the CCP.'
+  CONTACTS_TRANSFERRED_IN_BY_AGENT: 'Contacts transferred in by agent: This metric counts the contacts transferred in by an
+    agent using the CCP.'
+  CONTACTS_TRANSFERRED_IN_FROM_QUEUE: 'Contacts transferred in from queue: This metric counts the contacts transferred to
+    the queue from another in a **Transfer to queue** flow.'
+  CONTACTS_TRANSFERRED_OUT: 'Contacts transferred out: This metric counts the contacts transferred out from queue to queue,
+    and transferred out by an agent using the CCP, during the specified time range.'
+  CONTACTS_TRANSFERRED_OUT_BY_AGENT: 'Contacts transferred out by agent: This metric counts the contacts transferred out by
+    an agent using the CCP.'
+  CONTACTS_TRANSFERRED_OUT_EXTERNAL: 'Contacts transferred out external: This metric counts the contacts that an agent transferred
+    from the queue to an external source, such as a phone number other than the phone number for your contact center. [historical
+    only]'
+  CONTACTS_TRANSFERRED_OUT_INTERNAL: 'Contacts transferred out internal: This metric counts the contacts for the queue that
+    an agent transferred to an internal source, such as a queue or another agent. [historical only]'
+  CONTACTS_TRANSFERRED_OUT_FROM_QUEUE: 'Contacts transferred out queue: This metric counts the contacts that were transferred
+    from one queue to another queue using a **Transfer to Queue** flow.'
+  CONVERSATIONS_ABANDONED: 'Conversations abandoned: This metric measures the count of contacts where no messages were sent
+    by either the Agent or Customer or both.'
+  CURRENT_CASES: 'Current cases: This metric counts the total cases existing in a given domain for a specific point in time.
+    [historical only]'
+  SUM_HOLD_TIME: 'Customer hold time: This metric measures the total time that customers spent on hold after being connected
+    to an agent. [historical only]'
+  PERCENT_TALK_TIME_CUSTOMER: 'Customer talk time percent: This metric provides the talk time by a customer in a voice conversation
+    as a percent of the total conversation duration. [historical only]'
+  DELIVERY_ATTEMPTS: 'Delivery attempts: This metric measures the delivery outcome of a campaign outreach attempt.'
+  DELIVERY_ATTEMPT_DISPOSITION_RATE: 'Delivery attempt disposition rate: This metric measures the percentage of each delivery
+    outcome from a campaign outreach.'
+  SUM_ERROR_STATUS_TIME_AGENT: 'Error status time: For a specific agent, this metric measures the total time contacts were
+    in an error status. [historical only]'
+  EVALUATIONS_PERFORMED: 'Evaluations performed: This metric provides the number of evaluations performed with evaluation
+    status as "Submitted." Evaluations for calibrations are excluded from this metric.'
+  FLOWS_OUTCOME: 'Flows outcome: This metric returns the count for following flow outcomes within the specified start time
+    and end time.'
+  PERCENT_FLOWS_OUTCOME: 'Flows outcome percentage: This metric returns the percentage of the specified outcome type in the
+    metric level filter.'
+  FLOWS_STARTED: 'Flows started: This metric count the flows that started running within the specified start time and end
+    time.'
+  HUMAN_ANSWERED_CALLS: 'Human answered: This metric counts the outbound campaign calls that were connected to a live customer.'
+  MAX_FLOW_TIME: 'Maximum flow time: This metric returns the maximum time the flow took to completed for the specified start
+    time and end time.'
+  QUEUED_TIME: 'Maximum queued time: This metric measures the longest time that a contact spent waiting in the queue.'
+  MIN_FLOW_TIME: 'Minimum flow time: This metric returns the minimum time a flow took to complete within the specified start
+    time and end time.'
+  AGENT_NON_ADHERENT_TIME: 'Non-adherent time: This metric is available in AWS Regions only where Forecasting, capacity planning,
+    and scheduling is available. [historical only]'
+  PERCENT_NON_TALK_TIME: 'Non-talk time percent: This metric provides the non-talk time in a voice conversation as a percent
+    of the total conversation duration. [historical only]'
+  OCCUPANCY: 'Occupancy: This metric provides the percentage of time that agents were active on contacts.'
+  OLDEST_CONTACT_AGE: 'Oldest: This metric measures the length of time in the queue for the contact that has been in the queue
+    the longest. [real-time only]'
+  AGENTS_ONLINE: 'Online agents: This metric counts the agents who have set their status in the CCP to something other than
+    **Offline**. [real-time only]'
+  SUM_ONLINE_TIME_AGENT: 'Online time: This metric measures the total time that an agent spent with their CCP set to a status
+    other than **Offline**. [historical only]'
+  PERCENT_BOT_CONVERSATIONS_OUTCOME: 'Percent bot conversations outcome: This metric provides the percentage of total conversations
+    that ended in the specific outcome type specified in the metric level filter (BOT_CONVERSATION_OUTCOME_TYPE).'
+  PERCENT_BOT_INTENTS_OUTCOME: 'Percent bot intents outcome: This metric provides the percentage of intents that ended in
+    the specific outcome type specified in the metric level filter (BOT_INTENT_OUTCOME_TYPE).'
+  POSITION_IN_QUEUE: 'Position in Queue: This metric calculates the position of the contact in a queue while accounting for
+    the channel (voice, chat, task, or email) and whether a routing step is used.'
+  RECIPIENTS_ATTEMPTED: 'Recipients attempted: This metric measures the approximate count of outbound campaign recipients
+    attempted for delivery.'
+  RECIPIENTS_INTERACTED: 'Recipients interacted: This metric measures the approximate count of outbound campaign recipients
+    who interacted with the engagement after a successful delivery attempt.'
+  RECIPIENTS_TARGETED: 'Recipients targeted: This metric measures the count of outbound campaign recipients identified as
+    the target audience for the campaign.'
+  AGENT_SCHEDULED_TIME: 'Scheduled time: This metric is available in AWS Regions only where Forecasting, capacity planning,
+    and scheduling is available. [historical only]'
+  CONTACTS_SCHEDULED: 'Scheduled: This metric counts the customers in the queue for which there is a callback scheduled. [real-time
+    only]'
+  SERVICE_LEVEL: 'Service level *X*: This metric provides the percentage of contacts removed from the queue between 0 and
+    *X* after being added to it.'
+  AGENTS_STAFFED: 'Staffed agents: This metric counts the total number of agents who are online, and not in NPT (a custom
+    status). [real-time only]'
+  STEP_CONTACTS_QUEUED: 'Step contacts queued: This metric counts the contacts that entered a specific routing step in the
+    queue.'
+  PERCENT_CONTACTS_STEP_EXPIRED: 'Step expired %: This metric provides the percentage of contacts for which the specific routing
+    step expired.'
+  PERCENT_CONTACTS_STEP_JOINED: 'Step joined: This metric provides the percentage of contacts that joined with an agent at
+    the routing step.'
+  PERCENT_TALK_TIME: 'Talk time percent: This metric provides the talk time in a voice conversation as a percent of the total
+    conversation duration. [historical only]'

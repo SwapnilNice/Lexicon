@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<HistPlugin>
+    <DataSourceNode>
+        <Vendor>Genesys</Vendor>
+        <AgentSystemNode>
+            <TimePeriod><DateTime>20250602T0900</DateTime><period>PT15M</period></TimePeriod>
+            <AgentSystemData>
+                <AgentValue>U100</AgentValue>
+                <InternalContacts><count>1</count></InternalContacts>
+                <InternalHandleTime><duration><totalseconds>101</totalseconds></duration></InternalHandleTime>
+                <ReadyTime><duration><totalseconds>300</totalseconds></duration></ReadyTime>
+                <NotReadyTime><duration><totalseconds>90</totalseconds></duration></NotReadyTime>
+                <OutboundContacts><count>2</count></OutboundContacts>
+                <OutboundHandleTime><duration><totalseconds>200</totalseconds></duration></OutboundHandleTime>
+                <LoginTime><duration><totalseconds>900</totalseconds></duration></LoginTime>
+            </AgentSystemData>
+            <AgentSystemData>
+                <AgentValue>U101</AgentValue>
+                <InternalContacts><count>2</count></InternalContacts>
+                <InternalHandleTime><duration><totalseconds>102</totalseconds></duration></InternalHandleTime>
+                <ReadyTime><duration><totalseconds>300</totalseconds></duration></ReadyTime>
+                <NotReadyTime><duration><totalseconds>90</totalseconds></duration></NotReadyTime>
+                <OutboundContacts><count>2</count></OutboundContacts>
+                <OutboundHandleTime><duration><totalseconds>200</totalseconds></duration></OutboundHandleTime>
+                <LoginTime><duration><totalseconds>900</totalseconds></duration></LoginTime>
+            </AgentSystemData>
+        </AgentSystemNode>
+    </DataSourceNode>
+</HistPlugin>

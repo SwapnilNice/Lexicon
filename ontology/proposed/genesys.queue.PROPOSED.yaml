@@ -1,0 +1,69 @@
+# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
+# have an expert review. AI proposes, harness verifies, human ratifies.
+meta:
+  vendor: Genesys
+  report: queue
+  status: proposed
+  engine: heuristic
+fields:
+  QueueValue: queueId
+  AbandonedShort: nAbandoned
+  AbandonedLong: nAbandoned
+  HandledShort: tAnswered_ms
+  HandledLong: tAnswered_ms
+  HandleTime: tHandle_ms
+  HoldTime: tHeld_ms
+  WorkTime: tAcw_ms
+  QueueDelayTime: tAnswered_ms
+  ContactsActive: contactsActive
+proposals:
+  QueueValue:
+    proposed: queueId
+    confidence: 0.62
+    rationale: best name/keyword match to 'queueId'
+    needs_review: false
+  AbandonedShort:
+    proposed: nAbandoned
+    confidence: 0.88
+    rationale: best name/keyword match to 'nAbandoned'
+    needs_review: false
+  AbandonedLong:
+    proposed: nAbandoned
+    confidence: 0.88
+    rationale: best name/keyword match to 'nAbandoned'
+    needs_review: false
+  HandledShort:
+    proposed: tAnswered_ms
+    confidence: 1.0
+    rationale: best name/keyword match to 'tAnswered_ms'
+    needs_review: false
+  HandledLong:
+    proposed: tAnswered_ms
+    confidence: 1.0
+    rationale: best name/keyword match to 'tAnswered_ms'
+    needs_review: false
+  HandleTime:
+    proposed: tHandle_ms
+    confidence: 0.75
+    rationale: best name/keyword match to 'tHandle_ms'
+    needs_review: false
+  HoldTime:
+    proposed: tHeld_ms
+    confidence: 0.75
+    rationale: best name/keyword match to 'tHeld_ms'
+    needs_review: false
+  WorkTime:
+    proposed: tAcw_ms
+    confidence: 0.88
+    rationale: best name/keyword match to 'tAcw_ms'
+    needs_review: false
+  QueueDelayTime:
+    proposed: tAnswered_ms
+    confidence: 1.0
+    rationale: best name/keyword match to 'tAnswered_ms'
+    needs_review: false
+  ContactsActive:
+    proposed: contactsActive
+    confidence: 1.0
+    rationale: best name/keyword match to 'contactsActive'
+    needs_review: false

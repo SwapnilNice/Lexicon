@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<HistPlugin>
+    <DataSourceNode>
+        <Vendor>Avaya</Vendor>
+        <AgentQueueNode>
+            <TimePeriod><DateTime>20250602T0900</DateTime><period>PT15M</period></TimePeriod>
+            <AgentQueueData>
+                <QueueValue>44</QueueValue>
+                <AgentValue>30128</AgentValue>
+                <Handled><count>10</count></Handled>
+                <HandleTime><duration><totalseconds>120</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>10</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>50</totalseconds></duration></WorkTime>
+            </AgentQueueData>
+            <AgentQueueData>
+                <QueueValue>13</QueueValue>
+                <AgentValue>30128</AgentValue>
+                <Handled><count>20</count></Handled>
+                <HandleTime><duration><totalseconds>350</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>20</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>60</totalseconds></duration></WorkTime>
+            </AgentQueueData>
+        </AgentQueueNode>
+    </DataSourceNode>
+</HistPlugin>

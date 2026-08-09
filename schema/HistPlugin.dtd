@@ -1,0 +1,73 @@
+<!-- HistPlugin.dtd — reconstructed from NICE WFM 8.x Import History XML Connector
+     File Specification, Rev 2.0 (Sept 2024), pages 21-22.
+     Use ONLY for validation. Omit the DOCTYPE in production files. -->
+
+<!ELEMENT duration (totalseconds)>
+<!ELEMENT totalseconds (#PCDATA)>          <!-- integer >= 0 -->
+<!ELEMENT count (#PCDATA)>                 <!-- integer >= 0 -->
+<!ELEMENT percentage (#PCDATA)>            <!-- decimal, leading 0, e.g. 0.42 not .42 -->
+<!ELEMENT average (#PCDATA)>
+<!ELEMENT OutputType (#PCDATA)>
+
+<!ELEMENT TimePeriod (DateTime,period?)>
+<!ELEMENT DateTime (#PCDATA)>              <!-- CCYYMMDDThhmm -->
+<!ELEMENT period (#PCDATA)>                <!-- ISO 8601, e.g. PT15M, PT30M, P1D -->
+
+<!ELEMENT HistPlugin (DataSourceNode*)>
+
+<!ELEMENT DataSourceNode
+  (Vendor,(QueueNode*|AgentQueueNode*|AgentSystemNode*|AgentActivityNode*))>
+
+<!ELEMENT Vendor (#PCDATA)>
+
+<!ELEMENT QueueNode (TimePeriod,QueueData*)>
+<!ELEMENT AgentQueueNode (TimePeriod,AgentQueueData*)>
+<!ELEMENT AgentSystemNode (TimePeriod,AgentSystemData*)>
+<!ELEMENT AgentActivityNode (TimePeriod,AgentActivityData*)>
+
+<!ELEMENT QueueData
+  (QueueValue,ContactsReceived?,AbandonedShort?,AbandonedLong?,HandledShort?,
+   HandledLong?,HandleTime?,HoldTime?,WorkTime?,QueueDelayTime?,SvcLvlPct?,
+   BackLog?,BackLogExpired?,BackLogNotExpired?,RightPartyContacts?,
+   RightPartyTalkTime?,WrongPartyContacts?,WrongPartyTalkTime?,ContactsActive?)>
+  <!ELEMENT QueueValue (#PCDATA)>
+  <!ELEMENT ContactsReceived (count)>
+  <!ELEMENT AbandonedShort (count)>
+  <!ELEMENT AbandonedLong (count)>
+  <!ELEMENT HandledShort (count)>
+  <!ELEMENT HandledLong (count)>
+  <!ELEMENT HandleTime (duration)>
+  <!ELEMENT HoldTime (duration)>
+  <!ELEMENT WorkTime (duration)>
+  <!ELEMENT QueueDelayTime (duration)>
+  <!ELEMENT SvcLvlPct (percentage)>
+  <!ELEMENT BackLog (count)>
+  <!ELEMENT BackLogExpired (count)>
+  <!ELEMENT BackLogNotExpired (count)>
+  <!ELEMENT RightPartyContacts (count)>
+  <!ELEMENT RightPartyTalkTime (duration)>
+  <!ELEMENT WrongPartyContacts (count)>
+  <!ELEMENT WrongPartyTalkTime (duration)>
+  <!ELEMENT ContactsActive (count)>
+
+<!ELEMENT AgentQueueData
+  (QueueValue,AgentValue,Handled?,HandleTime?,HoldTime?,WorkTime?,
+   RightPartyContacts?,RightPartyTalkTime?,WrongPartyContacts?,WrongPartyTalkTime?)>
+  <!ELEMENT AgentValue (#PCDATA)>
+  <!ELEMENT Handled (count)>
+
+<!ELEMENT AgentSystemData
+  (AgentValue,InternalContacts?,InternalHandleTime?,ReadyTime?,NotReadyTime?,
+   OutboundContacts?,OutboundHandleTime?,LoginTime?)>
+  <!ELEMENT InternalContacts (count)>
+  <!ELEMENT InternalHandleTime (duration)>
+  <!ELEMENT ReadyTime (duration)>
+  <!ELEMENT NotReadyTime (duration)>
+  <!ELEMENT OutboundContacts (count)>
+  <!ELEMENT OutboundHandleTime (duration)>
+  <!ELEMENT LoginTime (duration)>
+
+<!ELEMENT AgentActivityData (AgentValue,Event*)>
+  <!ELEMENT Event (code,DateTime,reason?)>
+  <!ELEMENT code (#PCDATA)>
+  <!ELEMENT reason (#PCDATA)>

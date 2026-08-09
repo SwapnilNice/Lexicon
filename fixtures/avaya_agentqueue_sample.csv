@@ -1,0 +1,3 @@
+INTERVAL_START,split,logid,acdcalls,acdtime,holdtime,acwtime
+20250602T0900,44,30128,10,110,10,50
+20250602T0900,13,30128,20,330,20,60

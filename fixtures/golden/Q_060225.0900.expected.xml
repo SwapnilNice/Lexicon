@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<HistPlugin>
+    <DataSourceNode>
+        <Vendor>Avaya</Vendor>
+        <QueueNode>
+            <TimePeriod><DateTime>20250602T0900</DateTime><period>PT15M</period></TimePeriod>
+            <QueueData>
+                <QueueValue>44</QueueValue>
+                <AbandonedShort><count>2</count></AbandonedShort>
+                <AbandonedLong><count>1</count></AbandonedLong>
+                <HandledShort><count>40</count></HandledShort>
+                <HandledLong><count>8</count></HandledLong>
+                <HandleTime><duration><totalseconds>3120</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>240</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>600</totalseconds></duration></WorkTime>
+                <QueueDelayTime><duration><totalseconds>480</totalseconds></duration></QueueDelayTime>
+                <ContactsActive><count>1</count></ContactsActive>
+            </QueueData>
+            <QueueData>
+                <QueueValue>13</QueueValue>
+                <AbandonedShort><count>1</count></AbandonedShort>
+                <AbandonedLong><count>0</count></AbandonedLong>
+                <HandledShort><count>18</count></HandledShort>
+                <HandledLong><count>2</count></HandledLong>
+                <HandleTime><duration><totalseconds>1600</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>100</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>300</totalseconds></duration></WorkTime>
+                <QueueDelayTime><duration><totalseconds>260</totalseconds></duration></QueueDelayTime>
+                <ContactsActive><count>0</count></ContactsActive>
+            </QueueData>
+        </QueueNode>
+    </DataSourceNode>
+</HistPlugin>

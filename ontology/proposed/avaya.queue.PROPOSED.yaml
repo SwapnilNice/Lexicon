@@ -1,0 +1,76 @@
+# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
+# have an expert review. AI proposes, harness verifies, human ratifies.
+meta:
+  vendor: Avaya
+  report: queue
+  status: proposed
+  engine: reference
+fields:
+  QueueValue: split
+  AbandonedShort: slvlabns
+  AbandonedLong: abncalls - slvlabns
+  HandledShort: acceptable
+  HandledLong: acdcalls - acceptable
+  HandleTime: acdtime + holdtime
+  HoldTime: holdtime
+  WorkTime: acwtime
+  QueueDelayTime: anstime
+  ContactsActive: contactsactive
+proposals:
+  QueueValue:
+    proposed: split
+    confidence: 0.85
+    rationale: reused pattern QueueValue=key['key'] learned from approved vendors
+    needs_review: false
+  AbandonedShort:
+    proposed: slvlabns
+    confidence: 0.85
+    rationale: reused pattern AbandonedShort=single['abandon_sl'] learned from approved
+      vendors
+    needs_review: false
+  AbandonedLong:
+    proposed: abncalls - slvlabns
+    confidence: 0.85
+    rationale: reused pattern AbandonedLong=diff['abandon_total', 'abandon_sl'] learned
+      from approved vendors
+    needs_review: false
+  HandledShort:
+    proposed: acceptable
+    confidence: 0.85
+    rationale: reused pattern HandledShort=single['handled_sl'] learned from approved
+      vendors
+    needs_review: false
+  HandledLong:
+    proposed: acdcalls - acceptable
+    confidence: 0.85
+    rationale: reused pattern HandledLong=diff['handled_total', 'handled_sl'] learned
+      from approved vendors
+    needs_review: false
+  HandleTime:
+    proposed: acdtime + holdtime
+    confidence: 0.85
+    rationale: reused pattern HandleTime=sum['talk', 'hold'] learned from approved
+      vendors
+    needs_review: false
+  HoldTime:
+    proposed: holdtime
+    confidence: 0.85
+    rationale: reused pattern HoldTime=single['hold'] learned from approved vendors
+    needs_review: false
+  WorkTime:
+    proposed: acwtime
+    confidence: 0.85
+    rationale: reused pattern WorkTime=single['acw'] learned from approved vendors
+    needs_review: false
+  QueueDelayTime:
+    proposed: anstime
+    confidence: 0.85
+    rationale: reused pattern QueueDelayTime=single['wait'] learned from approved
+      vendors
+    needs_review: false
+  ContactsActive:
+    proposed: contactsactive
+    confidence: 0.85
+    rationale: reused pattern ContactsActive=single['active'] learned from approved
+      vendors
+    needs_review: false

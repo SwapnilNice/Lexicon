@@ -1,0 +1,9 @@
+{
+  "intervalStart": "20250602T0900",
+  "period": "PT15M",
+  "note": "Genesys per-user-per-queue aggregate. Durations in milliseconds.",
+  "results": [
+    { "queueId": "Sales",   "userId": "U100", "metrics": { "nHandled": 12, "tTalk_ms": 300000, "tHeld_ms": 30000, "tAcw_ms": 60000 } },
+    { "queueId": "Support", "userId": "U100", "metrics": { "nHandled": 8,  "tTalk_ms": 160000, "tHeld_ms": 10000, "tAcw_ms": 30000 } }
+  ]
+}

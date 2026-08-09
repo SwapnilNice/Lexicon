@@ -1,0 +1,47 @@
+# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
+# have an expert review. AI proposes, harness verifies, human ratifies.
+meta:
+  vendor: Avaya
+  report: agentqueue
+  status: proposed
+  engine: reference
+fields:
+  QueueValue: split
+  AgentValue: logid
+  Handled: acdcalls
+  HandleTime: acdtime + holdtime
+  HoldTime: holdtime
+  WorkTime: acwtime
+proposals:
+  QueueValue:
+    proposed: split
+    confidence: 0.85
+    rationale: reused pattern QueueValue=key['key'] learned from approved vendors
+    needs_review: false
+  AgentValue:
+    proposed: logid
+    confidence: 0.85
+    rationale: reused pattern AgentValue=key['agent_key'] learned from approved vendors
+    needs_review: false
+  Handled:
+    proposed: acdcalls
+    confidence: 0.85
+    rationale: reused pattern Handled=single['handled_total'] learned from approved
+      vendors
+    needs_review: false
+  HandleTime:
+    proposed: acdtime + holdtime
+    confidence: 0.85
+    rationale: reused pattern HandleTime=sum['talk', 'hold'] learned from approved
+      vendors
+    needs_review: false
+  HoldTime:
+    proposed: holdtime
+    confidence: 0.85
+    rationale: reused pattern HoldTime=single['hold'] learned from approved vendors
+    needs_review: false
+  WorkTime:
+    proposed: acwtime
+    confidence: 0.85
+    rationale: reused pattern WorkTime=single['acw'] learned from approved vendors
+    needs_review: false

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<HistPlugin>
+    <DataSourceNode>
+        <Vendor>Genesys</Vendor>
+        <AgentQueueNode>
+            <TimePeriod><DateTime>20250602T0900</DateTime><period>PT15M</period></TimePeriod>
+            <AgentQueueData>
+                <QueueValue>Sales</QueueValue>
+                <AgentValue>U100</AgentValue>
+                <Handled><count>12</count></Handled>
+                <HandleTime><duration><totalseconds>330</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>30</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>60</totalseconds></duration></WorkTime>
+            </AgentQueueData>
+            <AgentQueueData>
+                <QueueValue>Support</QueueValue>
+                <AgentValue>U100</AgentValue>
+                <Handled><count>8</count></Handled>
+                <HandleTime><duration><totalseconds>170</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>10</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>30</totalseconds></duration></WorkTime>
+            </AgentQueueData>
+        </AgentQueueNode>
+    </DataSourceNode>
+</HistPlugin>

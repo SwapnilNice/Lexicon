@@ -1,0 +1,13 @@
+# APPROVED executable mapping — Genesys (per user per queue) -> Agent-Queue.
+# Durations are milliseconds -> /1000. HandleTime = talk + hold (not tHandle).
+meta:
+  vendor: Genesys
+  report: agentqueue
+  status: approved
+fields:
+  QueueValue:  "queueId"
+  AgentValue:  "userId"
+  Handled:     "nHandled"
+  HandleTime:  "(tTalk_ms + tHeld_ms) / 1000"
+  HoldTime:    "tHeld_ms / 1000"
+  WorkTime:    "tAcw_ms / 1000"

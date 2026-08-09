@@ -1,0 +1,9 @@
+{
+  "intervalStart": "20250602T0900",
+  "period": "PT15M",
+  "note": "Genesys per-user aggregate. Durations in milliseconds.",
+  "results": [
+    { "userId": "U100", "metrics": { "nInternal": 1, "tInternal_ms": 101000, "tIdle_ms": 300000, "tNotResponding_ms": 90000, "nOutbound": 2, "tOutbound_ms": 200000, "tActive_ms": 900000 } },
+    { "userId": "U101", "metrics": { "nInternal": 2, "tInternal_ms": 102000, "tIdle_ms": 300000, "tNotResponding_ms": 90000, "nOutbound": 2, "tOutbound_ms": 200000, "tActive_ms": 900000 } }
+  ]
+}

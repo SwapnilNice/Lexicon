@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<HistPlugin>
+    <DataSourceNode>
+        <Vendor>Genesys</Vendor>
+        <QueueNode>
+            <TimePeriod><DateTime>20250602T0900</DateTime><period>PT15M</period></TimePeriod>
+            <QueueData>
+                <QueueValue>Sales</QueueValue>
+                <AbandonedShort><count>3</count></AbandonedShort>
+                <AbandonedLong><count>1</count></AbandonedLong>
+                <HandledShort><count>42</count></HandledShort>
+                <HandledLong><count>8</count></HandledLong>
+                <HandleTime><duration><totalseconds>3300</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>300</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>700</totalseconds></duration></WorkTime>
+                <QueueDelayTime><duration><totalseconds>520</totalseconds></duration></QueueDelayTime>
+                <ContactsActive><count>2</count></ContactsActive>
+            </QueueData>
+            <QueueData>
+                <QueueValue>Support</QueueValue>
+                <AbandonedShort><count>1</count></AbandonedShort>
+                <AbandonedLong><count>0</count></AbandonedLong>
+                <HandledShort><count>19</count></HandledShort>
+                <HandledLong><count>3</count></HandledLong>
+                <HandleTime><duration><totalseconds>1700</totalseconds></duration></HandleTime>
+                <HoldTime><duration><totalseconds>100</totalseconds></duration></HoldTime>
+                <WorkTime><duration><totalseconds>300</totalseconds></duration></WorkTime>
+                <QueueDelayTime><duration><totalseconds>270</totalseconds></duration></QueueDelayTime>
+                <ContactsActive><count>1</count></ContactsActive>
+            </QueueData>
+        </QueueNode>
+    </DataSourceNode>
+</HistPlugin>

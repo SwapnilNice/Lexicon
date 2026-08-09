@@ -1,0 +1,114 @@
+# ==========================================================================
+# Lexicon — Genesys Cloud Dialect Map
+# Maps Genesys Cloud Analytics (conversation aggregate) metrics -> canonical_wfm.yaml.
+# Second vendor: proves the canonical ontology is the anchor and each vendor
+# maps to it DIFFERENTLY.
+#
+# METRIC NAMES: based on Genesys Cloud analytics aggregate metrics. CONFIRM each
+# against your actual API response; `confirmed: false` = expert must verify.
+#
+# !!! TWO CROSS-VENDOR TRAPS (the whole point of adding Genesys) !!!
+#  1. UNITS: Genesys durations are in MILLISECONDS. NICE wants total SECONDS.
+#            Every duration must be divided by 1000.
+#  2. HANDLE TIME MEANING IS OPPOSITE TO AVAYA:
+#            Genesys  tHandle = tTalk + tHeld + tAcw   (INCLUDES after-call work)
+#            NICE     HandleTime = talk + hold          (EXCLUDES after-call work)
+#            => NICE HandleTime = (tTalk + tHeld)/1000  ==  (tHandle - tAcw)/1000
+#            Never map Genesys tHandle straight onto NICE HandleTime.
+# ==========================================================================
+
+meta:
+  vendor: "Genesys"
+  system: "Genesys Cloud — Analytics conversation aggregate query"
+  media_scope: immediate_response
+  unit_note: "All t* duration metrics are MILLISECONDS. Divide by 1000 for NICE totalseconds."
+  source:
+    - name: "Genesys Cloud — Analytics conversation aggregate query"
+      api: "analytics/conversations/aggregates/query"
+      url: "https://developer.genesys.cloud/analyticsdatamanagement/analytics/aggregate/conversation-query"
+    - name: "NICE WFM Import History XML Connector File Specification 8.x (target)"
+
+queue:
+  QueueValue:
+    genesys: ["queueId (or queue name)"]
+    rule: "Use the Genesys queue id as the unique queue key."
+    confirmed: false
+
+  AbandonedShort:
+    genesys: ["nAbandonedWithinSL"]
+    rule: "Abandons within the service-level threshold."
+    confirmed: false
+  AbandonedLong:
+    genesys: ["nAbandoned", "nAbandonedWithinSL"]
+    rule: "nAbandoned - nAbandonedWithinSL. If SL split unavailable, put total nAbandoned here."
+    confirmed: false
+
+  HandledShort:
+    genesys: ["nOffered filtered by isOverSla=false (within SL)"]
+    rule: "Answered within service level. In the aggregate API this comes from a count filtered on the isOverSla dimension — confirm the exact metric/filter for your query."
+    confirmed: false
+  HandledLong:
+    genesys: ["nOffered / handled minus within-SL"]
+    rule: "Handled outside SL (or total handled if not split). Confirm count source in your aggregate response."
+    confirmed: false
+
+  HandleTime:
+    genesys: ["tTalk", "tHeld"]        # NOT tHandle
+    rule: "HandleTime = (tTalk + tHeld) / 1000. Equivalent to (tHandle - tAcw)/1000."
+    trap: "!!! Genesys tHandle INCLUDES tAcw and is in ms. Do NOT map tHandle directly, and do NOT forget the /1000. Mapping tHandle straight across double-counts ACW AND is 1000x too large."
+    confirmed: false
+
+  HoldTime:
+    genesys: ["tHeld"]
+    rule: "HoldTime = tHeld / 1000."
+    confirmed: false
+
+  WorkTime:
+    genesys: ["tAcw"]
+    rule: "WorkTime = tAcw / 1000 (after-call work only)."
+    confirmed: false
+
+  QueueDelayTime:
+    genesys: ["tAnswer"]           # real metric is tAnswer (ASA); confirm in your response
+    rule: "Queue wait before answer = tAnswer / 1000 (excludes IVR)."
+    trap: "tAnswer is ms. Do not use tAbandon (abandon wait)."
+    confirmed: false
+
+  ContactsActive:
+    genesys: ["provided/derived"]
+    rule: "Contacts answered this interval that arrived earlier. Derive or omit if unavailable."
+    confirmed: false
+
+  # Not applicable to inbound voice: ContactsReceived, SvcLvlPct (WFM derives),
+  # BackLog*, RightParty*, WrongParty*.
+
+agent_queue:
+  QueueValue: { genesys: ["queueId"], rule: "Same key as queue.QueueValue.", confirmed: false }
+  AgentValue: { genesys: ["userId"], rule: "Genesys user id.", confirmed: false }
+  Handled:    { genesys: ["nHandled"], rule: "Handled by this user on this queue.", confirmed: false }
+  HandleTime: { genesys: ["tTalk", "tHeld"], rule: "(tTalk + tHeld)/1000.",
+                trap: "Not tHandle; not ms.", confirmed: false }
+  HoldTime:   { genesys: ["tHeld"], rule: "tHeld/1000.", confirmed: false }
+  WorkTime:   { genesys: ["tAcw"], rule: "tAcw/1000.", confirmed: false }
+
+agent_system:
+  AgentValue:    { genesys: ["userId"], rule: "Genesys user id.", confirmed: false }
+  ReadyTime:     { genesys: ["tAgentRoutingStatus=IDLE"], rule: "Time in idle/ready presence, /1000.", confirmed: false }
+  NotReadyTime:  { genesys: ["tOrganizationPresence=NOT_READY / tSystemPresence"], rule: "Not-ready time /1000, EXCLUDE ACW.", trap: "Do not add tAcw.", confirmed: false }
+  LoginTime:     { genesys: ["tAgentRoutingStatus total / staffed"], rule: "Logged-in time /1000.", confirmed: false }
+
+drift_watchlist:
+  forbidden_terms:
+    - "tHandle"        # includes ACW + ms; must NOT be emitted as NICE HandleTime
+  boundary_terms:      # Genesys metric names must not appear past the adapter boundary
+    - "tTalk"
+    - "tHeld"
+    - "tAcw"
+    - "tHandle"
+    - "tAnswered"
+    - "tAbandon"
+    - "nOffered"
+    - "nHandled"
+    - "nAbandoned"
+    - "queueId"
+    - "userId"

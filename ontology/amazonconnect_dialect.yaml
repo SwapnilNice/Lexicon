@@ -1,0 +1,223 @@
+# ==========================================================================
+# Lexicon — AmazonConnect Dialect Map
+# Generated from fixtures/vendor_catalogs/amazonconnect.yaml
+# Media scope: immediate_response
+#
+# NOTE ON DIMENSIONS: Amazon Connect returns historical data grouped by
+# dimensions (Queue, Agent, Channel, etc.) that are NOT metrics — they don't
+# have API metric identifiers. In the catalog we only captured metrics.
+# For QueueValue / AgentValue below, the vendor term is the *grouping key*
+# name Amazon Connect uses in exports (Queue ARN or Agent ARN), not a metric.
+# Confirm the exact column name against your GetMetricDataV2 response format
+# or the CSV export from the admin website.
+#
+# NOTE ON UNITS: All Amazon Connect duration metrics are returned in seconds
+# by the API (the underlying millisecond fields like Agent.AgentInteractionDuration
+# are converted server-side; see the "Calculation logic" blocks in the AWS
+# docs). This matches NICE canonical `duration_seconds` — no /1000 needed.
+# ==========================================================================
+meta:
+  vendor: "AmazonConnect"
+  system: "Amazon Connect historical metrics via GetMetricDataV2 API / admin website export"
+  media_scope: immediate_response
+  source:
+    - name: "Amazon Connect Administrator Guide — Metric definitions"
+      url: "https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.html"
+
+# ------------------------------------------------------------------------
+# QUEUE -> canonical queue.*
+# ------------------------------------------------------------------------
+queue:
+  QueueValue:
+    amazonconnect: [QueueArn]
+    rule: "QueueArn (grouping dimension, not a metric)"
+    trap: "Amazon Connect returns metrics grouped BY queue via a dimension, not as a value inside metric rows. The 'vendor term' here is the grouping-column name in the export/API response, not a GetMetricDataV2 metric identifier. Confirm the exact column name (Queue ARN vs Queue Id vs Queue Name) against your actual export."
+    confirmed: false
+
+  ContactsReceived:
+    amazonconnect: [CONTACTS_QUEUED]
+    rule: "CONTACTS_QUEUED"
+    trap: "CONTACTS_QUEUED counts contacts placed in the queue (EnqueueTimestamp present). NICE ContactsReceived is 'entered the router' — subtly different (Amazon queue enqueue happens AFTER routing decision). For inbound voice this canonical field is not_required, so approximation is acceptable."
+    confirmed: false
+
+  AbandonedShort:
+    amazonconnect: [SUM_CONTACTS_ABANDONED_IN_X]
+    rule: "SUM_CONTACTS_ABANDONED_IN_X"
+    trap: "X is a configurable threshold set in the report. Confirm X matches your NICE service-level 'short' definition before treating this as short-abandon."
+    confirmed: false
+
+  AbandonedLong:
+    amazonconnect: [CONTACTS_ABANDONED, SUM_CONTACTS_ABANDONED_IN_X]
+    rule: "CONTACTS_ABANDONED - SUM_CONTACTS_ABANDONED_IN_X"
+    trap: "The AWS docs page has multiple 'Contacts abandoned' entries — the general CONTACTS_ABANDONED counts ALL queued+disconnected contacts (not just first-callback). Verify against your GetMetricDataV2 usage. If SL split isn't wanted, put total CONTACTS_ABANDONED here and empty in AbandonedShort."
+    confirmed: false
+
+  HandledShort:
+    amazonconnect: [SUM_CONTACTS_ANSWERED_IN_X]
+    rule: "SUM_CONTACTS_ANSWERED_IN_X"
+    trap: "Same X-threshold consideration as AbandonedShort — X is configured per report."
+    confirmed: false
+
+  HandledLong:
+    amazonconnect: [CONTACTS_HANDLED, SUM_CONTACTS_ANSWERED_IN_X]
+    rule: "CONTACTS_HANDLED - SUM_CONTACTS_ANSWERED_IN_X"
+    trap: "CONTACTS_HANDLED in the AWS docs is described under 'customer first callback' — verify it's the general handled count when you query it, not the callback-specific one. If SL split not wanted, put total CONTACTS_HANDLED here."
+    confirmed: false
+
+  HandleTime:
+    amazonconnect: [SUM_HANDLE_TIME, AFTER_CONTACT_WORK_TIME]
+    rule: "SUM_HANDLE_TIME - AFTER_CONTACT_WORK_TIME"
+    trap: "CRITICAL: Amazon Connect's SUM_HANDLE_TIME INCLUDES ACW (and agent pause for tasks). NICE HandleTime is talk+hold ONLY, EXCLUDES ACW. Must subtract AFTER_CONTACT_WORK_TIME. For voice (immediate_response media scope), agent pause is 0 so this formula is correct; for task-media the formula would need to also subtract agent pause. Do NOT use SUM_HANDLE_TIME straight (like the AI proposed) — it will over-count by however much ACW occurred."
+    confirmed: true
+
+  HoldTime:
+    amazonconnect: [SUM_HOLD_TIME]
+    rule: "SUM_HOLD_TIME"
+    trap: "SUM_HOLD_TIME is customer-hold time AFTER connect-to-agent; it excludes queue wait time. That matches NICE HoldTime semantics — but note Amazon separately has AVG_HOLD_TIME (average) — do NOT confuse the two."
+    confirmed: true
+
+  WorkTime:
+    amazonconnect: [AFTER_CONTACT_WORK_TIME]
+    rule: "AFTER_CONTACT_WORK_TIME"
+    trap: "ACW only. Never merged into HandleTime. Amazon Connect's ACW starts automatically when the conversation ends and stops when the agent changes status."
+    confirmed: true
+
+  QueueDelayTime:
+    amazonconnect: [QUEUE_ANSWER_TIME]
+    rule: "QUEUE_ANSWER_TIME"
+    trap: "QUEUE_ANSWER_TIME is an AVERAGE (avg wait-to-answer per contact); NICE canonical QueueDelayTime unit is duration_seconds — need to confirm whether NICE expects total-wait-across-contacts or average. If total is needed, multiply by CONTACTS_HANDLED (or use the 'aggregated on ENQUEUE timestamp' variant). Also excludes IVR time by Amazon's definition."
+    confirmed: false
+
+  ContactsActive:
+    amazonconnect: []
+    rule: ""
+    trap: "No direct Amazon Connect equivalent for 'answered this interval but arrived earlier'. CONTACTS_HANDLED_CONNECTED_TO_AGENT_TIME is close but not identical. Leave unmapped for now; canonical marks this as confirmed: false in Avaya too."
+    confirmed: false
+
+# ------------------------------------------------------------------------
+# AGENT-QUEUE -> canonical agent_queue.*
+# ------------------------------------------------------------------------
+agent_queue:
+  QueueValue:
+    amazonconnect: [QueueArn]
+    rule: "QueueArn (grouping dimension)"
+    trap: "Same dimension caveat as queue.QueueValue."
+    confirmed: false
+
+  AgentValue:
+    amazonconnect: [AgentArn]
+    rule: "AgentArn (grouping dimension, not a metric)"
+    trap: "Amazon Connect uses Agent ARN / User ARN as the agent identifier — confirm the exact column name (Agent ARN vs User Id vs Login) against your export."
+    confirmed: false
+
+  Handled:
+    amazonconnect: [CONTACTS_HANDLED]
+    rule: "CONTACTS_HANDLED (grouped by agent+queue)"
+    trap: "Verify CONTACTS_HANDLED counts general handled, not just callback (see queue.HandledLong note)."
+    confirmed: false
+
+  HandleTime:
+    amazonconnect: [SUM_HANDLE_TIME, AFTER_CONTACT_WORK_TIME]
+    rule: "SUM_HANDLE_TIME - AFTER_CONTACT_WORK_TIME"
+    trap: "Same trap as queue.HandleTime — SUM_HANDLE_TIME includes ACW; subtract AFTER_CONTACT_WORK_TIME. Applies per agent+queue grouping."
+    confirmed: true
+
+  HoldTime:
+    amazonconnect: [SUM_HOLD_TIME]
+    rule: "SUM_HOLD_TIME"
+    trap: "Customer-hold only. Amazon Connect does not separately expose agent-side hold vs customer-side hold at the metric level."
+    confirmed: true
+
+  WorkTime:
+    amazonconnect: [AFTER_CONTACT_WORK_TIME]
+    rule: "AFTER_CONTACT_WORK_TIME"
+    confirmed: true
+
+# ------------------------------------------------------------------------
+# AGENT-SYSTEM -> canonical agent_system.*
+# ------------------------------------------------------------------------
+agent_system:
+  AgentValue:
+    amazonconnect: [AgentArn]
+    rule: "AgentArn (grouping dimension)"
+    trap: "Same dimension caveat as agent_queue.AgentValue."
+    confirmed: false
+
+  LoginTime:
+    amazonconnect: [SUM_ONLINE_TIME_AGENT]
+    rule: "SUM_ONLINE_TIME_AGENT"
+    trap: "'Online time' in Amazon = total time CCP is set to anything other than Offline. Includes both Available and custom statuses. Matches NICE LoginTime (staffed = logged in) semantics. Note: this metric cannot be grouped by queue in AWS reports, only per-agent."
+    confirmed: true
+
+  ReadyTime:
+    amazonconnect: [SUM_IDLE_TIME_AGENT]
+    rule: "SUM_IDLE_TIME_AGENT"
+    trap: "'Agent idle time' in Amazon = time in Available status not handling contacts + time contacts were in Error state. Includes the ring-time from routing offer to agent accept. Close to NICE ReadyTime but not identical if Error-state time is significant in your call flow."
+    confirmed: true
+
+  NotReadyTime:
+    amazonconnect: [SUM_NON_PRODUCTIVE_TIME_AGENT]
+    rule: "SUM_NON_PRODUCTIVE_TIME_AGENT"
+    trap: "'Non-productive time' in Amazon = time in a CUSTOM status (i.e. anything other than Available or Offline). It EXCLUDES ACW (ACW is tracked separately, and does not put the agent into a custom status). Matches NICE NotReadyTime semantic 'AUX excluding ACW'."
+    confirmed: true
+
+  OutboundContacts:
+    amazonconnect: [CONTACTS_HANDLED_OUTBOUND]
+    rule: "CONTACTS_HANDLED_OUTBOUND"
+    trap: "Counts outbound contacts initiated by an agent via CCP/API. Does not include outbound-campaign (agentless) contacts — those are separate metrics."
+    confirmed: true
+
+  OutboundHandleTime:
+    amazonconnect: []
+    rule: ""
+    trap: "Amazon Connect does not expose a single 'sum handle time filtered to outbound'. To compute this you would need to filter historical data by contact-initiation-method = OUTBOUND at query time, then sum handle-time-minus-ACW. Not derivable from a single metric identifier. Consider leaving unmapped or deriving at query time via GetMetricDataV2 filters."
+    confirmed: false
+
+  InternalContacts:
+    amazonconnect: [CONTACTS_TRANSFERRED_IN_BY_AGENT]
+    rule: "CONTACTS_TRANSFERRED_IN_BY_AGENT"
+    trap: "NICE InternalContacts is agent-to-agent direct calls. Amazon Connect's closest concept is agent-initiated transfers via quick-connects. Semantics don't align cleanly — this is an approximation, not an equivalence. Consider leaving empty if strict match is needed."
+    confirmed: false
+
+  InternalHandleTime:
+    amazonconnect: []
+    rule: ""
+    trap: "No direct Amazon metric for handle-time-of-internal-transfers. Would need contact-record-level filtering."
+    confirmed: false
+
+drift_watchlist:
+  forbidden_terms:
+    - "HandledTime"
+    - "Backlog"
+    - "AHT"
+    - "Utilization"
+  boundary_terms:    # curated subset of the 173 catalog metrics — highest risk of leaking
+    - "SUM_HANDLE_TIME"
+    - "HANDLE_TIME"
+    - "SUM_HOLD_TIME"
+    - "AVG_HOLD_TIME"
+    - "AFTER_CONTACT_WORK_TIME"
+    - "INTERACTION_TIME"
+    - "INTERACTION_AND_HOLD_TIME"
+    - "PERCENT_TALK_TIME"
+    - "PERCENT_TALK_TIME_AGENT"
+    - "QUEUE_ANSWER_TIME"
+    - "AVG_QUEUE_ANSWER_TIME"
+    - "CONTACTS_QUEUED"
+    - "CONTACTS_HANDLED"
+    - "CONTACTS_ABANDONED"
+    - "SUM_CONTACTS_ANSWERED_IN_X"
+    - "SUM_CONTACTS_ABANDONED_IN_X"
+    - "SUM_IDLE_TIME_AGENT"
+    - "SUM_NON_PRODUCTIVE_TIME_AGENT"
+    - "SUM_ONLINE_TIME_AGENT"
+    - "AGENTS_STAFFED"
+    - "AGENTS_ONLINE"
+    - "AGENTS_AVAILABLE"
+    - "ACTIVE_AI_AGENTS"
+    - "CONTACTS_TRANSFERRED_OUT_INTERNAL"
+    - "CONTACTS_TRANSFERRED_IN_BY_AGENT"
+    - "CONTACTS_HANDLED_OUTBOUND"
+    - "QueueArn"
+    - "AgentArn"
+  boundary_rule: "AmazonConnect metric identifiers (SCREAMING_SNAKE_CASE) and dimension names (CamelCase ARNs) must NOT appear in canonical output or canonical-layer code."

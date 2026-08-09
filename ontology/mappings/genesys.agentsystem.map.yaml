@@ -1,0 +1,15 @@
+# APPROVED executable mapping — Genesys (per user) -> Agent-System.
+# Durations are milliseconds -> /1000.
+meta:
+  vendor: Genesys
+  report: agentsystem
+  status: approved
+fields:
+  AgentValue:          "userId"
+  InternalContacts:    "nInternal"
+  InternalHandleTime:  "tInternal_ms / 1000"
+  ReadyTime:           "tIdle_ms / 1000"
+  NotReadyTime:        "tNotResponding_ms / 1000"
+  OutboundContacts:    "nOutbound"
+  OutboundHandleTime:  "tOutbound_ms / 1000"
+  LoginTime:           "tActive_ms / 1000"

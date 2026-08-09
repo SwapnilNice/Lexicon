@@ -1,0 +1,39 @@
+{
+  "intervalStart": "20250602T0900",
+  "period": "PT15M",
+  "note": "Genesys Cloud analytics-style aggregate. Durations are MILLISECONDS. tHandle INCLUDES tAcw.",
+  "results": [
+    {
+      "queueId": "Sales",
+      "metrics": {
+        "nOffered": 58,
+        "nHandled": 50,
+        "nHandledWithinSL": 42,
+        "nAbandoned": 4,
+        "nAbandonedWithinSL": 3,
+        "tTalk_ms": 3000000,
+        "tHeld_ms": 300000,
+        "tAcw_ms": 700000,
+        "tHandle_ms": 4000000,
+        "tAnswered_ms": 520000,
+        "contactsActive": 2
+      }
+    },
+    {
+      "queueId": "Support",
+      "metrics": {
+        "nOffered": 24,
+        "nHandled": 22,
+        "nHandledWithinSL": 19,
+        "nAbandoned": 1,
+        "nAbandonedWithinSL": 1,
+        "tTalk_ms": 1600000,
+        "tHeld_ms": 100000,
+        "tAcw_ms": 300000,
+        "tHandle_ms": 2000000,
+        "tAnswered_ms": 270000,
+        "contactsActive": 1
+      }
+    }
+  ]
+}

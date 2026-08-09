@@ -1,0 +1,74 @@
+# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
+# have an expert review. AI proposes, harness verifies, human ratifies.
+meta:
+  vendor: AmazonConnect
+  report: queue
+  status: proposed
+  engine: reference
+fields:
+  QueueValue: QUEUE_ANSWER_TIME
+  AbandonedShort: CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
+  AbandonedLong: CONTACTS_ABANDONED - CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
+  HandledShort: PROACTIVE_INTENTS_ANSWERED
+  HandledLong: PROACTIVE_INTENTS_ANSWERED
+  HandleTime: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
+  HoldTime: INTERACTION_AND_HOLD_TIME
+  WorkTime: AFTER_CONTACT_WORK_TIME
+  QueueDelayTime: QUEUE_ANSWER_TIME
+  ContactsActive: ACTIVE_AI_AGENTS
+proposals:
+  QueueValue:
+    proposed: QUEUE_ANSWER_TIME
+    confidence: 0.85
+    rationale: reused pattern QueueValue=key['key'] learned from approved vendors
+    needs_review: false
+  AbandonedShort:
+    proposed: CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
+    confidence: 0.85
+    rationale: reused pattern AbandonedShort=single['abandon_sl'] learned from approved
+      vendors
+    needs_review: false
+  AbandonedLong:
+    proposed: CONTACTS_ABANDONED - CAMPAIGN_CONTACTS_ABANDONED_AFTER_X
+    confidence: 0.85
+    rationale: reused pattern AbandonedLong=diff['abandon_total', 'abandon_sl'] learned
+      from approved vendors
+    needs_review: false
+  HandledShort:
+    proposed: PROACTIVE_INTENTS_ANSWERED
+    confidence: 0.88
+    rationale: "no known pattern matched \u2014 naive name guess"
+    needs_review: true
+  HandledLong:
+    proposed: PROACTIVE_INTENTS_ANSWERED
+    confidence: 0.88
+    rationale: "no known pattern matched \u2014 naive name guess"
+    needs_review: true
+  HandleTime:
+    proposed: PERCENT_TALK_TIME_AGENT + INTERACTION_AND_HOLD_TIME
+    confidence: 0.85
+    rationale: reused pattern HandleTime=sum['talk', 'hold'] learned from approved
+      vendors
+    needs_review: false
+  HoldTime:
+    proposed: INTERACTION_AND_HOLD_TIME
+    confidence: 0.85
+    rationale: reused pattern HoldTime=single['hold'] learned from approved vendors
+    needs_review: false
+  WorkTime:
+    proposed: AFTER_CONTACT_WORK_TIME
+    confidence: 0.85
+    rationale: reused pattern WorkTime=single['acw'] learned from approved vendors
+    needs_review: false
+  QueueDelayTime:
+    proposed: QUEUE_ANSWER_TIME
+    confidence: 0.85
+    rationale: reused pattern QueueDelayTime=single['wait'] learned from approved
+      vendors
+    needs_review: false
+  ContactsActive:
+    proposed: ACTIVE_AI_AGENTS
+    confidence: 0.85
+    rationale: reused pattern ContactsActive=single['active'] learned from approved
+      vendors
+    needs_review: false

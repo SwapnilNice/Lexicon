@@ -1,0 +1,3 @@
+INTERVAL_START,split,acdcalls,acceptable,abncalls,slvlabns,acdtime,holdtime,acwtime,anstime,contactsactive
+20250602T0900,44,48,40,3,2,2880,240,600,480,1
+20250602T0900,13,20,18,1,1,1500,100,300,260,0

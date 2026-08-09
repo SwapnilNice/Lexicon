@@ -1,0 +1,15 @@
+# APPROVED executable mapping — Avaya hagent (per agent) -> Agent-System.
+# Per NICE spec: per-agent, cross-queue. No queue fields.
+meta:
+  vendor: Avaya
+  report: agentsystem
+  status: approved
+fields:
+  AgentValue:          "logid"
+  InternalContacts:    "da_acdcalls"
+  InternalHandleTime:  "da_acdtime"
+  ReadyTime:           "i_availtime"
+  NotReadyTime:        "ti_auxtime"     # AUX across all splits; excludes ACW
+  OutboundContacts:    "o_acdcalls"
+  OutboundHandleTime:  "o_acdtime"
+  LoginTime:           "i_stafftime"

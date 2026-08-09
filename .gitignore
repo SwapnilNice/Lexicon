@@ -1,0 +1,15 @@
+out/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Cached vendor documentation pages produced by `discover.py --crawl`.
+fixtures/vendor_docs/
+
+# Integrity Layer runtime state (per-customer history, baselines, registry)
+state/*
+!state/.gitkeep
+
+# Integrity Layer per-run outputs
+out/*
+!out/.gitkeep

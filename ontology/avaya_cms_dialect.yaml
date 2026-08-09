@@ -1,0 +1,142 @@
+# ==========================================================================
+# Lexicon — Avaya CMS Dialect Map   (VERIFIED against DB Items & Calculations R21)
+# Maps Avaya CMS historical tables -> canonical_wfm.yaml.
+#
+# Tables:
+#   Queue report        -> hsplit  (split/skill intrahour)
+#   Agent-Queue report  -> hagent  (agent-per-split intrahour)
+#   Agent-System report -> hagent  (aggregated per agent across splits)
+#
+# VERIFIED TIME SEMANTICS (from the manual, quoted):
+#   * ACDTIME  = "talk time of all ACDCALLS ... does NOT include HOLDTIME"
+#   * HOLDTIME = time ACD callers were on hold (SEPARATE from acdtime)
+#   * ACWTIME  = after-call work (SEPARATE again)
+#   => NICE HandleTime (talk+hold) = acdtime + holdtime     (must ADD hold)
+#      NICE WorkTime   (acw)       = acwtime                 (kept separate)
+#   * ANSTIME  = time in queue + ringing before answer (a wait metric, not talk)
+#   * ACCEPTABLE = ACDCALLS answered within SERVICELEVEL threshold
+#   * I_* items are interval-attributed; TI_AUXTIME sums AUX across all splits.
+#
+# confirmed: true  = verified in the R21 manual.
+# confirmed: false = still needs your sign-off (usually a modelling choice).
+# ==========================================================================
+
+meta:
+  vendor: "Avaya"
+  system: "Avaya CMS historical tables (hsplit, hagent), R21"
+  media_scope: immediate_response
+  note: "One canonical field can need MORE THAN ONE Avaya column (HandleTime = acdtime + holdtime)."
+  source:
+    - name: "Avaya CMS DB Items & Calculations R21 — Split/Skill database items"
+      url: "https://documentation.avaya.com/en-us/home/bundle/cms/AvayaCMSDBItemsCalculations_r21/DatabaseInfoDatabaseTables/CMSDatabaseTableItems/DatabaseInfoSplitskillDatabaseItems.html"
+    - name: "NICE WFM Import History XML Connector File Specification 8.x (target)"
+
+# --------------------------------------------------------------------------
+# QUEUE  (table: hsplit)  -> canonical queue.*
+# --------------------------------------------------------------------------
+queue:
+  QueueValue:
+    avaya: ["split"]
+    rule: "Split/skill number is the queue key."
+    confirmed: true
+  HandledShort:
+    avaya: ["acceptable"]
+    rule: "ACDCALLS answered within SERVICELEVEL."
+    confirmed: true
+  HandledLong:
+    avaya: ["acdcalls", "acceptable"]
+    rule: "acdcalls - acceptable (answered outside SL). If SL split not wanted, put total acdcalls here."
+    confirmed: true
+  AbandonedShort:
+    avaya: ["slvlabns"]
+    rule: "Abandons within the service level (SLVLABNS, a component of ABNCALLS)."
+    confirmed: false
+  AbandonedLong:
+    avaya: ["abncalls", "slvlabns"]
+    rule: "abncalls - slvlabns. If not split, put total abncalls here."
+    confirmed: false
+  HandleTime:
+    avaya: ["acdtime", "holdtime"]
+    rule: "HandleTime = acdtime + holdtime."
+    trap: "ACDTIME is TALK ONLY (excludes hold) -> you MUST add holdtime. And do NOT add acwtime (that is WorkTime)."
+    confirmed: true
+  HoldTime:
+    avaya: ["holdtime"]
+    rule: "holdtime (time ACD callers were on hold)."
+    confirmed: true
+  WorkTime:
+    avaya: ["acwtime"]
+    rule: "acwtime (after-call work) only."
+    trap: "Separate from acdtime. Never merged into HandleTime."
+    confirmed: true
+  QueueDelayTime:
+    avaya: ["anstime"]
+    rule: "anstime = time in queue + ringing before an agent answered. Excludes IVR."
+    trap: "Do not use abntime (that is abandon wait)."
+    confirmed: true
+  ContactsReceived:
+    avaya: ["callsoffered"]
+    rule: "callsoffered = acdcalls + abncalls + busycalls + disccalls + outflowcalls + dequecalls + icrpullcalls. Not required for inbound voice (Immediate Response) but available."
+    confirmed: true
+  ContactsActive:
+    avaya: ["derived"]
+    rule: "Answered this interval but arrived earlier. Not a native hsplit item; derive or omit."
+    confirmed: false
+  # Not applicable to inbound voice: SvcLvlPct (WFM derives), BackLog*, RightParty*, WrongParty*
+
+# --------------------------------------------------------------------------
+# AGENT-QUEUE  (table: hagent, per agent per split)  -> canonical agent_queue.*
+# --------------------------------------------------------------------------
+agent_queue:
+  QueueValue:  { avaya: ["split"], rule: "Split/skill key.", confirmed: true }
+  AgentValue:  { avaya: ["logid"], rule: "Agent login ID.", confirmed: true }
+  Handled:     { avaya: ["acdcalls"], rule: "ACD calls this agent answered on this split.", confirmed: true }
+  HandleTime:  { avaya: ["acdtime", "holdtime"], rule: "acdtime + holdtime for this agent/split.",
+                 trap: "acdtime excludes hold; add holdtime; do not add acwtime.", confirmed: true }
+  HoldTime:    { avaya: ["holdtime"], rule: "holdtime (agent HOLDTIME includes HOLDACDTIME).", confirmed: true }
+  WorkTime:    { avaya: ["acwtime"], rule: "acwtime for this agent.", confirmed: true }
+
+# --------------------------------------------------------------------------
+# AGENT-SYSTEM  (table: hagent, aggregated per agent across splits) -> agent_system.*
+# NOTE: hagent rows are per-agent-per-split. For agent-system totals, aggregate
+# across splits, or use the TI_/interval items where they already span splits.
+# --------------------------------------------------------------------------
+agent_system:
+  AgentValue:    { avaya: ["logid"], rule: "Agent login ID.", confirmed: true }
+  LoginTime:     { avaya: ["i_stafftime"], rule: "Time logged in during the interval (sum across splits, or use staffed time).", confirmed: false }
+  ReadyTime:     { avaya: ["i_availtime"], rule: "Available/ready time in the interval.", confirmed: true }
+  NotReadyTime:  { avaya: ["ti_auxtime"], rule: "AUX (not-ready) time across ALL splits (TI_AUXTIME). EXCLUDES ACW.",
+                   trap: "Use TI_AUXTIME (spans splits) not per-split i_auxtime, to avoid double counting. Do not add acwtime.", confirmed: false }
+  OutboundContacts:   { avaya: ["o_acdcalls"], rule: "Agent-initiated/adjunct outbound ACD calls.", confirmed: false }
+  OutboundHandleTime: { avaya: ["o_acdtime"], rule: "Talk time of o_acdcalls (excludes hold).", confirmed: false }
+  InternalContacts:   { avaya: ["da_acdcalls"], rule: "Direct-agent (agent-to-agent) ACD calls answered.", confirmed: false }
+  InternalHandleTime: { avaya: ["da_acdtime"], rule: "Talk time of da_acdcalls (excludes hold).", confirmed: false }
+
+drift_watchlist:
+  forbidden_terms:
+    - "HandledTime"   # legacy NICE name; canonical is HandleTime
+    - "Backlog"       # wrong casing; canonical is BackLog
+    - "AHT"           # analyst shorthand; must resolve to HandleTime semantics
+    - "Utilization"   # NOT Occupancy
+  boundary_terms:     # real Avaya column names — must not appear past the adapter boundary
+    - "acdtime"
+    - "acwtime"
+    - "holdtime"
+    - "holdacdtime"
+    - "anstime"
+    - "abncalls"
+    - "abntime"
+    - "acceptable"
+    - "slvlabns"
+    - "i_stafftime"
+    - "i_availtime"
+    - "i_auxtime"
+    - "ti_auxtime"
+    - "i_acdtime"
+    - "i_acwtime"
+    - "o_acdcalls"
+    - "o_acdtime"
+    - "da_acdcalls"
+    - "da_acdtime"
+    - "logid"
+  boundary_rule: "Avaya hsplit/hagent column names must NOT appear in canonical output or canonical-layer code."

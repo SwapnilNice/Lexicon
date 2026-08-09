@@ -1,0 +1,3 @@
+INTERVAL_START,logid,da_acdcalls,da_acdtime,i_availtime,ti_auxtime,o_acdcalls,o_acdtime,i_stafftime
+20250602T0900,30128,1,101,300,90,2,200,900
+20250602T0900,30143,2,102,300,90,2,200,900

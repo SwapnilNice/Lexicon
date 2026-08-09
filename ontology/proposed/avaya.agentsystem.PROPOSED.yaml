@@ -1,0 +1,62 @@
+# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
+# have an expert review. AI proposes, harness verifies, human ratifies.
+meta:
+  vendor: Avaya
+  report: agentsystem
+  status: proposed
+  engine: reference
+fields:
+  AgentValue: logid
+  InternalContacts: da_acdcalls
+  InternalHandleTime: da_acdtime
+  ReadyTime: i_availtime
+  NotReadyTime: ti_auxtime
+  OutboundContacts: o_acdcalls
+  OutboundHandleTime: o_acdtime
+  LoginTime: i_stafftime
+proposals:
+  AgentValue:
+    proposed: logid
+    confidence: 0.85
+    rationale: reused pattern AgentValue=key['agent_key'] learned from approved vendors
+    needs_review: false
+  InternalContacts:
+    proposed: da_acdcalls
+    confidence: 0.85
+    rationale: reused pattern InternalContacts=single['internal_count'] learned from
+      approved vendors
+    needs_review: false
+  InternalHandleTime:
+    proposed: da_acdtime
+    confidence: 0.85
+    rationale: reused pattern InternalHandleTime=single['internal_time'] learned from
+      approved vendors
+    needs_review: false
+  ReadyTime:
+    proposed: i_availtime
+    confidence: 0.85
+    rationale: reused pattern ReadyTime=single['ready'] learned from approved vendors
+    needs_review: false
+  NotReadyTime:
+    proposed: ti_auxtime
+    confidence: 0.85
+    rationale: reused pattern NotReadyTime=single['notready'] learned from approved
+      vendors
+    needs_review: false
+  OutboundContacts:
+    proposed: o_acdcalls
+    confidence: 0.85
+    rationale: reused pattern OutboundContacts=single['outbound_count'] learned from
+      approved vendors
+    needs_review: false
+  OutboundHandleTime:
+    proposed: o_acdtime
+    confidence: 0.85
+    rationale: reused pattern OutboundHandleTime=single['outbound_time'] learned from
+      approved vendors
+    needs_review: false
+  LoginTime:
+    proposed: i_stafftime
+    confidence: 0.85
+    rationale: reused pattern LoginTime=single['login'] learned from approved vendors
+    needs_review: false

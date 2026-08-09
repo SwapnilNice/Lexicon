@@ -1,0 +1,142 @@
+# ==========================================================================
+# Lexicon — Canonical WFM Ontology  (source of truth)
+# Extracted from: NICE WFM 8.x Import History XML Connector File Spec, Rev 2.0
+# This file defines WHAT each concept MEANS. It is vendor-neutral.
+# The vendor mapping lives in avaya_cms_dialect.yaml.
+#
+# units:   count | duration_seconds | percentage
+# xml:     nesting the value sits inside within the report
+# media:   requirement per NICE media type. Avaya inbound voice = immediate_response
+#          values: required | required_if_available | not_required | not_applicable | ignored
+# ==========================================================================
+
+meta:
+  spec: "Import History XML Connector File Specification WFM 8.x"
+  revision: "2.0"
+  interval: "15 or 30 minute summary (Queue, Agent-Queue, Agent-System)"
+  datetime_format: "CCYYMMDDThhmm"     # e.g. 20140102T0900
+  period_format: "ISO8601 (PT15M / PT30M)"
+
+# --------------------------------------------------------------------------
+# QUEUE DATA  (QueueNode / QueueData)
+# --------------------------------------------------------------------------
+queue:
+  QueueValue:
+    definition: "Contact Router contact queue identifier (the queue key)."
+    unit: key
+    key: true
+    constraint: "1-100 ASCII chars, unique per interval"
+    xml: "<QueueValue>...</QueueValue>"
+    media: { immediate_response: required, deferrable_response: required, outbound_campaign: required, outbound: required }
+
+  ContactsReceived:
+    definition: "Contacts that entered the router for this queue during the interval."
+    unit: count
+    xml: "<ContactsReceived><count>..</count></ContactsReceived>"
+    media: { immediate_response: not_required, deferrable_response: required, outbound_campaign: not_required, outbound: not_required }
+
+  AbandonedShort:
+    definition: "Abandoned before the grade-of-service (short) threshold."
+    unit: count
+    media: { immediate_response: required_if_available, deferrable_response: not_required, outbound_campaign: not_required, outbound: not_required }
+
+  AbandonedLong:
+    definition: "Abandoned after the grade-of-service threshold. If the vendor does not split short/long, put the TOTAL abandoned here."
+    unit: count
+    media: { immediate_response: required_if_available, deferrable_response: not_required, outbound_campaign: not_required, outbound: not_required }
+
+  HandledShort:
+    definition: "Handled before the grade-of-service threshold."
+    unit: count
+    media: { immediate_response: required_if_available, deferrable_response: not_required, outbound_campaign: not_required, outbound: not_required }
+
+  HandledLong:
+    definition: "Handled after the grade-of-service threshold. If not split, put TOTAL handled here."
+    unit: count
+    media: { immediate_response: required, deferrable_response: required, outbound_campaign: not_applicable, outbound: not_applicable }
+
+  HandleTime:
+    definition: "Total handle time of all handled contacts = TALK TIME + HOLD TIME. Does NOT include After-Call-Work."
+    unit: duration_seconds
+    trap: "HandleTime = talk + hold. ACW (wrap-up) is a SEPARATE field (WorkTime). Never fold ACW into HandleTime."
+    media: { immediate_response: required, deferrable_response: required, outbound_campaign: not_applicable, outbound: not_applicable }
+
+  HoldTime:
+    definition: "Total hold time for handled contacts in the interval."
+    unit: duration_seconds
+    media: { immediate_response: required_if_available, deferrable_response: not_required, outbound_campaign: required_if_available, outbound: required_if_available }
+
+  WorkTime:
+    definition: "Total After-Call-Work (WrapUp/ACW) time for handled contacts."
+    unit: duration_seconds
+    trap: "This is ACW ONLY. It is distinct from HandleTime."
+    media: { immediate_response: required_if_available, deferrable_response: required_if_available, outbound_campaign: required_if_available, outbound: required_if_available }
+
+  QueueDelayTime:
+    definition: "Total time customers waited in queue before being presented to an agent. For inbound voice this EXCLUDES IVR time. Peg to the same interval as Handled."
+    unit: duration_seconds
+    trap: "Exclude IVR/self-service time. WFM divides this by handled to get ASA."
+    media: { immediate_response: required_if_available, deferrable_response: required_if_available, outbound_campaign: not_required, outbound: not_required }
+
+  SvcLvlPct:
+    definition: "Service level percent."
+    unit: percentage
+    note: "For Immediate Response, WFM DERIVES this from HandledShort/Long + AbandonedShort/Long, so this field is IGNORED. Do not compute it for inbound voice."
+    media: { immediate_response: ignored, deferrable_response: required_if_available, outbound_campaign: not_applicable, outbound: not_applicable }
+
+  BackLog:      { definition: "Deferrable backlog total (= BackLogNotExpired + BackLogExpired).", unit: count,
+                  media: { immediate_response: not_applicable, deferrable_response: required_if_available, outbound_campaign: not_applicable, outbound: not_applicable } }
+  BackLogNotExpired: { definition: "Backlog whose service threshold has NOT passed.", unit: count,
+                  media: { immediate_response: not_applicable, deferrable_response: required_if_available, outbound_campaign: not_applicable, outbound: not_applicable } }
+  BackLogExpired:    { definition: "Backlog whose service threshold HAS passed.", unit: count,
+                  media: { immediate_response: not_applicable, deferrable_response: required_if_available, outbound_campaign: not_applicable, outbound: not_applicable } }
+
+  RightPartyContacts:  { definition: "Outdialer Right Party Contacts.", unit: count,
+                  media: { immediate_response: not_applicable, deferrable_response: not_applicable, outbound_campaign: required, outbound: required } }
+  RightPartyTalkTime:  { definition: "RPC handle time (a.k.a. RPC Handle Time).", unit: duration_seconds,
+                  media: { immediate_response: not_applicable, deferrable_response: not_applicable, outbound_campaign: required, outbound: required } }
+  WrongPartyContacts:  { definition: "Outdialer Wrong Party Contacts.", unit: count,
+                  media: { immediate_response: not_applicable, deferrable_response: not_applicable, outbound_campaign: required_if_available, outbound: required_if_available } }
+  WrongPartyTalkTime:  { definition: "WPC handle time (a.k.a. WPC Handle Time).", unit: duration_seconds,
+                  media: { immediate_response: not_applicable, deferrable_response: not_applicable, outbound_campaign: required_if_available, outbound: required_if_available } }
+
+  ContactsActive:
+    definition: "Contacts worked (answered) in THIS interval but that arrived in a PREVIOUS interval."
+    unit: count
+    media: { immediate_response: required, deferrable_response: required, outbound_campaign: not_applicable, outbound: required }
+
+# --------------------------------------------------------------------------
+# AGENT-QUEUE DATA  (AgentQueueNode / AgentQueueData)
+# per-agent, per-queue
+# --------------------------------------------------------------------------
+agent_queue:
+  QueueValue: { definition: "Queue key (see queue.QueueValue).", unit: key, key: true }
+  AgentValue:
+    definition: "Contact Router agent identifier (logon id, extension, name, email)."
+    unit: key
+    key: true
+    constraint: "1-256 ASCII chars, unique"
+  Handled:
+    definition: "Immediate + Deferrable contacts handled by THIS agent on THIS queue in the interval."
+    unit: count
+    media: { immediate_response: required, deferrable_response: required, outbound_campaign: not_required, outbound: not_required }
+  HandleTime: { definition: "Handle time (talk + hold) for this agent on this queue.", unit: duration_seconds,
+                trap: "talk + hold, NOT ACW." }
+  HoldTime:   { definition: "Hold time for this agent on this queue.", unit: duration_seconds }
+  WorkTime:   { definition: "ACW for this agent on this queue.", unit: duration_seconds }
+  # RPC/WPC fields also allowed for outbound — omitted for inbound-voice scope.
+
+# --------------------------------------------------------------------------
+# AGENT-SYSTEM DATA  (AgentSystemNode / AgentSystemData)
+# per-agent, cross-queue (login/ready/not-ready etc.)
+# --------------------------------------------------------------------------
+agent_system:
+  AgentValue: { definition: "Agent identifier (key).", unit: key, key: true }
+  InternalContacts:   { definition: "Internal (agent-to-agent / agent-to-supervisor) contacts RECEIVED by this agent. Pegged to receiver, not initiator.", unit: count }
+  InternalHandleTime: { definition: "Handle time of internal contacts received.", unit: duration_seconds }
+  ReadyTime:    { definition: "Time in Ready (available) state. Must not exceed interval length.", unit: duration_seconds }
+  NotReadyTime: { definition: "Time in Not-Ready state (logged in, not available, not in work). Excludes ACW.", unit: duration_seconds,
+                  trap: "Do NOT include After-Call-Work here; ACW is WorkTime." }
+  OutboundContacts:   { definition: "Agent-initiated outbound contacts (from the desktop). NOT the OCM dialer.", unit: count }
+  OutboundHandleTime: { definition: "Handle time of agent-initiated outbound contacts.", unit: duration_seconds }
+  LoginTime:    { definition: "Time the agent was logged in during the interval. Must not exceed interval length.", unit: duration_seconds }

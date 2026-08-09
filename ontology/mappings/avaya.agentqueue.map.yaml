@@ -1,0 +1,12 @@
+# APPROVED executable mapping — Avaya hagent (per agent per split) -> Agent-Queue.
+meta:
+  vendor: Avaya
+  report: agentqueue
+  status: approved
+fields:
+  QueueValue:  "split"
+  AgentValue:  "logid"
+  Handled:     "acdcalls"
+  HandleTime:  "acdtime + holdtime"   # talk + hold (acdtime excludes hold); not ACW
+  HoldTime:    "holdtime"
+  WorkTime:    "acwtime"

@@ -1,0 +1,30 @@
+# "Discovered" Genesys Cloud conversation-aggregate metric catalog.
+# Name + description as read from the analytics API docs. Durations are ms.
+meta:
+  vendor: Genesys
+  report: queue
+  api: "analytics/conversations/aggregates/query"
+  source:                     # where discovery reads the vendor's meaning from
+    - name: "Genesys Cloud — Analytics conversation aggregate query"
+      url: "https://developer.genesys.cloud/analyticsdatamanagement/analytics/aggregate/conversation-query"
+fields:
+  queueId:            "Identifier of the queue."
+  nHandled:           "Number of conversations handled."
+  nHandledWithinSL:   "Conversations handled within the service level."
+  nAbandoned:         "Number of conversations abandoned."
+  nAbandonedWithinSL: "Conversations abandoned within the service level."
+  tTalk_ms:           "Talk time in milliseconds."
+  tHeld_ms:           "Hold time in milliseconds."
+  tAcw_ms:            "After-call work time in milliseconds."
+  tHandle_ms:         "Total handle time in milliseconds (talk + hold + after-call work)."
+  tAnswered_ms:       "Time to answer / wait in queue before answer, in milliseconds."
+  contactsActive:     "Conversations answered this interval that arrived earlier."
+  # --- agent-level metrics (grouped by user), for Agent-Queue and Agent-System ---
+  userId:             "Agent (user) identifier."
+  nInternal:          "Internal conversations received by this agent."
+  tInternal_ms:       "Handle time of internal conversations, in milliseconds."
+  tIdle_ms:           "Time the agent was idle/available (ready), in milliseconds."
+  tNotResponding_ms:  "Time the agent was not-ready (not responding), in milliseconds."
+  nOutbound:          "Outbound conversations placed by this agent."
+  tOutbound_ms:       "Handle time of outbound conversations, in milliseconds."
+  tActive_ms:         "Time the agent was logged in / active, in milliseconds."

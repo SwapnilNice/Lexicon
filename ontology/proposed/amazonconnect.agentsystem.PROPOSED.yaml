@@ -1,0 +1,61 @@
+# AUTO-PROPOSED mapping — NOT yet approved. Run verify_mapping.py, then
+# have an expert review. AI proposes, harness verifies, human ratifies.
+meta:
+  vendor: AmazonConnect
+  report: agentsystem
+  status: proposed
+  engine: reference
+fields:
+  AgentValue: ACTIVE_AI_AGENTS
+  InternalContacts: CONTACTS_TRANSFERRED_OUT_INTERNAL
+  InternalHandleTime: CONTACTS_TRANSFERRED_OUT_INTERNAL
+  ReadyTime: SUM_IDLE_TIME_AGENT
+  NotReadyTime: AGENT_ADHERENT_TIME
+  OutboundContacts: CONTACTS_HANDLED_OUTBOUND
+  OutboundHandleTime: SUM_CONNECTING_TIME_AGENT
+  LoginTime: AGENTS_STAFFED
+proposals:
+  AgentValue:
+    proposed: ACTIVE_AI_AGENTS
+    confidence: 0.85
+    rationale: reused pattern AgentValue=key['agent_key'] learned from approved vendors
+    needs_review: false
+  InternalContacts:
+    proposed: CONTACTS_TRANSFERRED_OUT_INTERNAL
+    confidence: 0.85
+    rationale: reused pattern InternalContacts=single['internal_count'] learned from
+      approved vendors
+    needs_review: false
+  InternalHandleTime:
+    proposed: CONTACTS_TRANSFERRED_OUT_INTERNAL
+    confidence: 0.85
+    rationale: reused pattern InternalHandleTime=single['internal_time'] learned from
+      approved vendors
+    needs_review: false
+  ReadyTime:
+    proposed: SUM_IDLE_TIME_AGENT
+    confidence: 0.85
+    rationale: reused pattern ReadyTime=single['ready'] learned from approved vendors
+    needs_review: false
+  NotReadyTime:
+    proposed: AGENT_ADHERENT_TIME
+    confidence: 0.5
+    rationale: "no known pattern matched \u2014 naive name guess"
+    needs_review: true
+  OutboundContacts:
+    proposed: CONTACTS_HANDLED_OUTBOUND
+    confidence: 0.85
+    rationale: reused pattern OutboundContacts=single['outbound_count'] learned from
+      approved vendors
+    needs_review: false
+  OutboundHandleTime:
+    proposed: SUM_CONNECTING_TIME_AGENT
+    confidence: 0.85
+    rationale: reused pattern OutboundHandleTime=single['outbound_time'] learned from
+      approved vendors
+    needs_review: false
+  LoginTime:
+    proposed: AGENTS_STAFFED
+    confidence: 0.85
+    rationale: reused pattern LoginTime=single['login'] learned from approved vendors
+    needs_review: false
