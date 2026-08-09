@@ -60,6 +60,12 @@ queue:
     unit: duration_seconds
     trap: "HandleTime = talk + hold. ACW (wrap-up) is a SEPARATE field (WorkTime). Never fold ACW into HandleTime."
     media: { immediate_response: required, deferrable_response: required, outbound_campaign: not_applicable, outbound: not_applicable }
+    derivation:
+      formula: "{talk} + {hold}"
+      components:
+        - {tag: talk_time_like, required: true, placeholder: talk}
+        - {tag: hold_time_like, required: true, placeholder: hold}
+      forbid_tags: [acw_time_like]
 
   HoldTime:
     definition: "Total hold time for handled contacts in the interval."
@@ -120,8 +126,16 @@ agent_queue:
     definition: "Immediate + Deferrable contacts handled by THIS agent on THIS queue in the interval."
     unit: count
     media: { immediate_response: required, deferrable_response: required, outbound_campaign: not_required, outbound: not_required }
-  HandleTime: { definition: "Handle time (talk + hold) for this agent on this queue.", unit: duration_seconds,
-                trap: "talk + hold, NOT ACW." }
+  HandleTime:
+    definition: "Handle time (talk + hold) for this agent on this queue."
+    unit: duration_seconds
+    trap: "talk + hold, NOT ACW."
+    derivation:
+      formula: "{talk} + {hold}"
+      components:
+        - {tag: talk_time_like, required: true, placeholder: talk}
+        - {tag: hold_time_like, required: true, placeholder: hold}
+      forbid_tags: [acw_time_like]
   HoldTime:   { definition: "Hold time for this agent on this queue.", unit: duration_seconds }
   WorkTime:   { definition: "ACW for this agent on this queue.", unit: duration_seconds }
   # RPC/WPC fields also allowed for outbound — omitted for inbound-voice scope.
