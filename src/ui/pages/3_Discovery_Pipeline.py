@@ -218,13 +218,19 @@ if fc:
         )
     else:
         st.subheader(f"Available blueprints for {fc['name']}")
-        # One tab per blueprint — routing-model as the tab label
-        tabs = st.tabs([p.stem for p in blueprint_paths])
-        for tab, path in zip(tabs, blueprint_paths):
-            with tab:
-                content = path.read_text()
+        # Two tabs per routing model: the blueprint (admin-facing) + the derived
+        # WFM mapping (integration-engineer-facing, sub-project B4 v1 slice).
+        tab_labels = []
+        for p in blueprint_paths:
+            tab_labels += [f"📖 {p.stem}", f"🗺 WFM Mapping ({p.stem})"]
+        tabs = st.tabs(tab_labels)
+
+        for i, path in enumerate(blueprint_paths):
+            content = path.read_text()
+
+            # --- Blueprint tab ---
+            with tabs[i * 2]:
                 st.markdown(f"**Source:** `{path.relative_to(ROOT)}`")
-                # Split frontmatter from body so YAML doesn't render as prose
                 if content.startswith("---"):
                     parts = content.split("---", 2)
                     if len(parts) >= 3:
@@ -242,6 +248,73 @@ if fc:
                     file_name=path.name,
                     mime="text/markdown",
                     key=f"dl_{path.stem}",
+                )
+
+            # --- WFM Mapping tab (derived from the blueprint) ---
+            with tabs[i * 2 + 1]:
+                try:
+                    from lexicon.blueprints.wfm_mapping import derive_wfm_mapping
+                    mapping = derive_wfm_mapping(
+                        blueprint_path=path,
+                        events_path=BLUEPRINTS_DIR / "events.yaml",
+                        canonical_path=ROOT / "ontology" / "canonical_wfm.yaml",
+                        report="queue",
+                    )
+                except Exception as e:  # noqa: BLE001
+                    st.error(f"Failed to derive WFM mapping: {e}")
+                    continue
+
+                st.caption(mapping["meta"]["note"])
+
+                # Primitive concepts extracted from blueprint events.
+                primitives = mapping.get("primitives", {})
+                if primitives:
+                    st.markdown("**Primitive time concepts (from blueprint events):**")
+                    prim_rows = [
+                        {
+                            "Concept": name,
+                            "Formula": p["formula"],
+                            "Source Events": ", ".join(p["source_events"]),
+                        }
+                        for name, p in primitives.items()
+                    ]
+                    st.dataframe(prim_rows, use_container_width=True, hide_index=True)
+
+                # Canonical WFM fields
+                st.markdown("**Canonical WFM fields (composed):**")
+                proposals = mapping.get("proposals", {})
+                if not proposals:
+                    st.info("No canonical WFM fields could be derived.")
+                else:
+                    wfm_rows = []
+                    for canon, prop in proposals.items():
+                        wfm_rows.append({
+                            "Canonical Field": canon,
+                            "Proposed Formula": prop["proposed"] or "—",
+                            "Confidence": prop["confidence"],
+                            "Status": "✓ derivable" if prop["proposed"] else "✗ missing",
+                            "Rationale": prop["rationale"][:120],
+                        })
+                    st.dataframe(wfm_rows, use_container_width=True, hide_index=True)
+
+                # Downloadable YAML in the sub-project A PROPOSED shape
+                import yaml as _yaml
+                mapping_yaml = _yaml.safe_dump(mapping, sort_keys=False, width=140)
+                with st.expander("Full mapping YAML", expanded=False):
+                    st.code(mapping_yaml, language="yaml")
+                st.download_button(
+                    "⬇ Download WFM mapping (.PROPOSED.yaml)",
+                    data=mapping_yaml,
+                    file_name=f"{fc['slug']}.{path.stem}.PROPOSED.yaml",
+                    mime="text/yaml",
+                    key=f"dl_wfm_{path.stem}",
+                )
+
+                st.caption(
+                    "The formulas above reference platform objects — they aren't executable "
+                    "by `engine.py` today because Salesforce/D365-style timestamp subtraction "
+                    "needs integration code you (or your customer) write. This is a REFERENCE "
+                    "document for that integration."
                 )
     st.stop()
 
