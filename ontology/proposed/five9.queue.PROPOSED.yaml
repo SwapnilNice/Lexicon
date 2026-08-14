@@ -4,7 +4,7 @@ meta:
   report: queue
   status: proposed
   produced_by: lexicon-discover
-  produced_at: '2026-08-09T18:59:17+00:00'
+  produced_at: '2026-08-14T09:26:33+00:00'
 fields:
   QueueValue: skill
   AbandonedShort: callsAbandonedInSLA

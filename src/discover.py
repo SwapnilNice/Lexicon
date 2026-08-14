@@ -263,7 +263,9 @@ def fields_from_text_llm(text: str, vendor: str) -> dict:
         client = anthropic.Anthropic()
         msg = client.messages.create(model="claude-sonnet-5", max_tokens=3000,
                                      messages=[{"role": "user", "content": prompt}])
-        data = yaml.safe_load(msg.content[0].text)
+        raw = msg.content[0].text
+        raw = re.sub(r"^```[a-z]*\n?", "", raw.strip(), flags=re.MULTILINE).strip("`").strip()
+        data = yaml.safe_load(raw)
         return data.get("fields", {})
     except Exception as e:  # noqa: BLE001
         # No key / SDK: write the prompt so you can run it in Claude Code instead.

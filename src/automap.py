@@ -275,6 +275,7 @@ def propose_llm(catalog: dict, vendor: str, report="queue"):
             model="claude-sonnet-5", max_tokens=2000,
             messages=[{"role": "user", "content": prompt}])
         text = msg.content[0].text
+        text = re.sub(r"^```[a-z]*\n?", "", text.strip(), flags=re.MULTILINE).strip("`").strip()
         data = yaml.safe_load(text)
         return data["fields"], data.get("proposals", {})
     except Exception as e:  # noqa: BLE001

@@ -1,0 +1,155 @@
+# AUTO-PROPOSED mapping — run verify_mapping.py, then have an expert review.
+meta:
+  vendor: zoom_acd
+  report: queue
+  status: proposed
+  produced_by: lexicon-discover
+  produced_at: '2026-08-14T11:55:57+00:00'
+fields:
+  QueueValue: skills
+  AbandonedLong: abandoned_count
+  HandledLong: inbound_handled_count
+  HandleTime: talk_duration + hold_duration / 1000
+  HoldTime: hold_duration / 1000
+  WorkTime: outbound_wrap_up_time
+  QueueDelayTime: in_queue_wait_duration / 1000
+proposals:
+  QueueValue:
+    proposed: skills
+    confidence: 0.4
+    rationale: 'best queue_key_like match: skills (weight=0.40)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: skill_category_id
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_category_id'
+    - formula: skill_category_name
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_category_name'
+    - formula: skill_id
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_id'
+    - formula: skill_name
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_name'
+    - formula: skill_proficiency_level
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_proficiency_level'
+    - formula: allow_agent_select_skill_for_transfer
+      confidence: 0.4
+      note: 'alternate queue_key_like match: allow_agent_select_skill_for_transfer'
+    - formula: agent_skills
+      confidence: 0.4
+      note: 'alternate queue_key_like match: agent_skills'
+    - formula: optional_skills
+      confidence: 0.4
+      note: 'alternate queue_key_like match: optional_skills'
+    - formula: required_skills
+      confidence: 0.4
+      note: 'alternate queue_key_like match: required_skills'
+    - formula: matched_skills_and_intents
+      confidence: 0.4
+      note: 'alternate queue_key_like match: matched_skills_and_intents'
+    - formula: requested_skill_intent_combinations
+      confidence: 0.4
+      note: 'alternate queue_key_like match: requested_skill_intent_combinations'
+    - formula: routing_match_failure_skill_mismatch
+      confidence: 0.4
+      note: 'alternate queue_key_like match: routing_match_failure_skill_mismatch'
+    - formula: skill_mismatch_agents
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_mismatch_agents'
+    - formula: used_skill_intent_combinations
+      confidence: 0.4
+      note: 'alternate queue_key_like match: used_skill_intent_combinations'
+    - formula: backup_skills
+      confidence: 0.4
+      note: 'alternate queue_key_like match: backup_skills'
+    - formula: backup_skill_name
+      confidence: 0.4
+      note: 'alternate queue_key_like match: backup_skill_name'
+    - formula: default_skill_id
+      confidence: 0.4
+      note: 'alternate queue_key_like match: default_skill_id'
+    - formula: default_skill_name
+      confidence: 0.4
+      note: 'alternate queue_key_like match: default_skill_name'
+    - formula: skill_category_required
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_category_required'
+    - formula: skill_categories
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_categories'
+    - formula: skill_category_description
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_category_description'
+    - formula: skill_type
+      confidence: 0.4
+      note: 'alternate queue_key_like match: skill_type'
+  AbandonedShort:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching abandoned_within_sl_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  AbandonedLong:
+    proposed: abandoned_count
+    confidence: 0.59
+    rationale: total-only fallback (abandoned_count); within-SL split missing
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandledShort:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching handled_within_sl_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandledLong:
+    proposed: inbound_handled_count
+    confidence: 0.59
+    rationale: total-only fallback (inbound_handled_count); within-SL split missing
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HandleTime:
+    proposed: talk_duration + hold_duration / 1000
+    confidence: 0.56
+    rationale: composed from ['talk_duration', 'hold_duration'] per derivation
+    needs_review: true
+    needs_human: true
+    alternates: []
+  HoldTime:
+    proposed: hold_duration / 1000
+    confidence: 0.68
+    rationale: 'best hold_time_like match: hold_duration (weight=0.68)'
+    needs_review: false
+    needs_human: false
+    alternates: []
+  WorkTime:
+    proposed: outbound_wrap_up_time
+    confidence: 0.78
+    rationale: 'best acw_time_like match: outbound_wrap_up_time (weight=0.78)'
+    needs_review: false
+    needs_human: false
+    alternates:
+    - formula: wrap_up_time
+      confidence: 0.78
+      note: 'alternate acw_time_like match: wrap_up_time'
+  QueueDelayTime:
+    proposed: in_queue_wait_duration / 1000
+    confidence: 0.85
+    rationale: 'best queue_delay_time_like match: in_queue_wait_duration (weight=0.85)'
+    needs_review: false
+    needs_human: false
+    alternates: []
+  ContactsActive:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching contacts_active_like with unit=count
+    needs_review: true
+    needs_human: true
+    alternates: []

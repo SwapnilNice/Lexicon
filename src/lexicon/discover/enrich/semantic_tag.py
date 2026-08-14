@@ -40,6 +40,7 @@ def TAG_LEXICON() -> dict[str, set[str]]:                  # noqa: N802 — publ
 
 
 _TOKEN_RE = re.compile(r"[^A-Za-z]+")
+_NEGATION_PREFIXES = frozenset({"non", "not", "no", "without", "except", "exclude", "excluding"})
 
 
 def _tokens(name: str, desc: str) -> set[str]:
@@ -48,10 +49,26 @@ def _tokens(name: str, desc: str) -> set[str]:
     return {p for p in parts if p}
 
 
+def _negated_in_name(keywords: set[str], name_l: str) -> set[str]:
+    """Return keywords that appear directly after a negation prefix in the field name.
+
+    e.g. AVG_NON_TALK_TIME → 'talk' is negated for talk_time_like scoring.
+    """
+    parts = [p for p in _TOKEN_RE.split(name_l) if p]
+    negated = set()
+    for i, part in enumerate(parts):
+        if part in keywords and i > 0 and parts[i - 1] in _NEGATION_PREFIXES:
+            negated.add(part)
+    return negated
+
+
 def _score_tag(keywords: set[str], name: str, desc: str, toks: set[str]) -> float:
     name_l = name.lower()
-    substr = sum(1 for kw in keywords if len(kw) >= 4 and kw in name_l)
-    token = len(keywords & toks)
+    # Exclude keywords that are negated in the field name (e.g. NON_TALK → not talk_time_like)
+    negated = _negated_in_name(keywords, name_l)
+    effective = keywords - negated
+    substr = sum(1 for kw in effective if len(kw) >= 4 and kw in name_l)
+    token = len(effective & toks)
     if substr == 0 and token == 0:
         return 0.0
     raw = 3 * substr + token

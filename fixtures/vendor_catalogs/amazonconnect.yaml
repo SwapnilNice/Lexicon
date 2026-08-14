@@ -3,7 +3,7 @@ meta:
   vendor: amazonconnect
   resolved_via: registry
   produced_by: lexicon-discover
-  produced_at: '2026-08-09T18:12:23+00:00'
+  produced_at: '2026-08-14T12:07:20+00:00'
   sources:
   - kind: html_doc
     url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md

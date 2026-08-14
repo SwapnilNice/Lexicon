@@ -11,6 +11,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+import re
+
 import yaml
 
 from .llm import LLMClient
@@ -108,6 +110,7 @@ def resolve_vendor_with_fallback(
         model="claude-sonnet-4-6",
         prompt=SEARCH_PROMPT_TEMPLATE.format(vendor=query),
     )
+    text = re.sub(r"^```[a-z]*\n?", "", text.strip(), flags=re.MULTILINE).strip("`").strip()
     data = yaml.safe_load(text) or {}
     if "slug" not in data or "sources" not in data:
         raise ResolveError(

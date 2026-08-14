@@ -4,58 +4,56 @@ meta:
   report: agentqueue
   status: proposed
   produced_by: lexicon-discover
-  produced_at: '2026-08-09T18:37:28+00:00'
+  produced_at: '2026-08-14T09:30:54+00:00'
 fields:
-  QueueValue: Transfertimed-outinternalcallstoskillvoicemail
-  AgentValue: ShowAgentalldialattemptsascontactsessions
+  QueueValue: skill
+  AgentValue: agentId
+  Handled: callsHandled
+  HandleTime: (averageTalkTime + averageHoldTime) * callsHandled
+  HoldTime: averageHoldTime * callsHandled
+  WorkTime: averageWrapTime * callsHandled
 proposals:
   QueueValue:
-    proposed: Transfertimed-outinternalcallstoskillvoicemail
-    confidence: 0.3
-    rationale: 'best queue_key_like match: Transfertimed-outinternalcallstoskillvoicemail
-      (weight=0.30)'
+    proposed: skill
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Skill (see queue.QueueValue).
     needs_review: true
     needs_human: true
-    alternates:
-    - formula: Manageskillvoicemails
-      confidence: 0.3
-      note: 'alternate queue_key_like match: Manageskillvoicemails'
+    alternates: []
   AgentValue:
-    proposed: ShowAgentalldialattemptsascontactsessions
-    confidence: 0.3
-    rationale: 'best agent_key_like match: ShowAgentalldialattemptsascontactsessions
-      (weight=0.30)'
+    proposed: agentId
+    confidence: 0.7
+    rationale: "dialect override from ontology/five9_dialect.yaml | Five9 agent identifier\
+      \ \u2014 logon name or system ID."
     needs_review: true
     needs_human: true
-    alternates:
-    - formula: Viewagentdata
-      confidence: 0.3
-      note: 'alternate agent_key_like match: Viewagentdata'
+    alternates: []
   Handled:
-    proposed: null
-    confidence: 0.0
-    rationale: no candidate matching handled_total_like with unit=count
+    proposed: callsHandled
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | Handled ACD calls
+      by this agent on this skill.
     needs_review: true
     needs_human: true
     alternates: []
   HandleTime:
-    proposed: null
-    confidence: 0.0
-    rationale: 'missing components: [''talk_time_like'', ''hold_time_like'']'
+    proposed: (averageTalkTime + averageHoldTime) * callsHandled
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml | TALK + HOLD * count.
     needs_review: true
     needs_human: true
     alternates: []
   HoldTime:
-    proposed: null
-    confidence: 0.0
-    rationale: no candidate matching hold_time_like with unit=duration_seconds
+    proposed: averageHoldTime * callsHandled
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml
     needs_review: true
     needs_human: true
     alternates: []
   WorkTime:
-    proposed: null
-    confidence: 0.0
-    rationale: no candidate matching acw_time_like with unit=duration_seconds
+    proposed: averageWrapTime * callsHandled
+    confidence: 0.7
+    rationale: dialect override from ontology/five9_dialect.yaml
     needs_review: true
     needs_human: true
     alternates: []

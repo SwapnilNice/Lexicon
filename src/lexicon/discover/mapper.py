@@ -16,6 +16,7 @@ Algorithm (per canonical concept C in the current report):
 from __future__ import annotations
 from pathlib import Path
 from typing import Any
+import re
 import yaml
 
 from .models import EnrichedField, ProposedField
@@ -298,6 +299,13 @@ def _load_dialect(vendor_slug: str, report: str) -> dict[str, dict]:
 
 _DIALECT_PLACEHOLDER_TOKENS = {"derived", "n/a", "na", "tbd", "todo", "unknown", "?", ""}
 
+# Matches executable formulas like "A - B", "A + B / 1000", "A - B + C".
+# Rejects human-readable prose (sentences with ".", "=", or spaces inside identifiers).
+_FORMULA_RE = re.compile(
+    r"^\s*[A-Za-z_][A-Za-z0-9_]*(\s*/\s*\d+)?"
+    r"(\s*[-+*/]\s*[A-Za-z_][A-Za-z0-9_]*(\s*/\s*\d+)?)*\s*$"
+)
+
 
 def _dialect_to_formula(entry: dict) -> str | None:
     """Extract an executable-ish formula from a dialect entry.
@@ -323,6 +331,14 @@ def _dialect_to_formula(entry: dict) -> str | None:
         candidate: str | None = None
         if isinstance(v, list) and len(v) == 1:
             candidate = str(v[0])
+        elif isinstance(v, list) and len(v) > 1:
+            # Multi-term list: the formula is expressed in the `rule` field
+            # (e.g. "A - B" where A and B are both vendor terms).
+            # Only use rule if it looks like an executable expression, not prose.
+            rule = entry.get("rule", "").strip()
+            if rule and rule.lower() not in _DIALECT_PLACEHOLDER_TOKENS and _FORMULA_RE.match(rule):
+                return rule
+            return None
         elif isinstance(v, str):
             candidate = v
         if candidate is not None:

@@ -17,6 +17,7 @@ from .enrich.unit_infer import infer_units
 from .extract.html_structured import extract_html_structured
 from .extract.markdown import extract_markdown
 from .extract.openapi import extract_openapi
+from .extract.rest_api_text import extract_rest_api_text
 from .fetch.html import fetch_html_source
 from .fetch.openapi import fetch_openapi_source
 from .llm import LLMClient
@@ -56,7 +57,11 @@ def _extract(docs: list[SourceDoc]) -> list[RawField]:
     out: list[RawField] = []
     for d in docs:
         if d.kind == "html":
-            out.extend(extract_html_structured(d))
+            structured = extract_html_structured(d)
+            out.extend(structured)
+            if not structured:
+                # Fallback: REST/OpenAPI rendered docs use inline "name type — desc" pattern
+                out.extend(extract_rest_api_text(d))
         elif d.kind == "markdown":
             out.extend(extract_markdown(d))
         elif d.kind == "openapi_schema":

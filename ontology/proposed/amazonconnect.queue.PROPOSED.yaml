@@ -4,27 +4,37 @@ meta:
   report: queue
   status: proposed
   produced_by: lexicon-discover
-  produced_at: '2026-08-09T18:12:00+00:00'
+  produced_at: '2026-08-14T12:07:20+00:00'
 fields:
+  QueueValue: QueueArn
+  AbandonedShort: SUM_CONTACTS_ABANDONED_IN_X
   AbandonedLong: AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS
+  HandledShort: SUM_CONTACTS_ANSWERED_IN_X
   HandledLong: API_CONTACTS_HANDLED
   HandleTime: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
-  HoldTime: SUM_INTERACTION_AND_HOLD_TIME
+  HoldTime: SUM_HOLD_TIME
   WorkTime: AFTER_CONTACT_WORK_TIME
-  QueueDelayTime: ESTIMATED_WAIT_TIME
+  QueueDelayTime: QUEUE_ANSWER_TIME
   ContactsActive: ACTIVE_AI_AGENTS
 proposals:
   QueueValue:
-    proposed: null
-    confidence: 0.0
-    rationale: no candidate matching queue_key_like with unit=key
+    proposed: QueueArn
+    confidence: 0.7
+    rationale: 'dialect override from ontology/amazonconnect_dialect.yaml | QueueArn
+      (grouping dimension, not a metric) | TRAP: Amazon Connect returns metrics grouped
+      BY queue via a dimension, not as a value inside metric rows. The ''vendor term''
+      here is the grouping-column name in the export/API response, not a GetMetricDataV2
+      metric identifier. Confirm the exact column name (Queue ARN vs Queue Id vs Queue
+      Name) against your actual export.'
     needs_review: true
     needs_human: true
     alternates: []
   AbandonedShort:
-    proposed: null
-    confidence: 0.0
-    rationale: no candidate matching abandoned_within_sl_like with unit=count
+    proposed: SUM_CONTACTS_ABANDONED_IN_X
+    confidence: 0.7
+    rationale: 'dialect override from ontology/amazonconnect_dialect.yaml | SUM_CONTACTS_ABANDONED_IN_X
+      | TRAP: X is a configurable threshold set in the report. Confirm X matches your
+      NICE service-level ''short'' definition before treating this as short-abandon.'
     needs_review: true
     needs_human: true
     alternates: []
@@ -37,9 +47,11 @@ proposals:
     needs_human: true
     alternates: []
   HandledShort:
-    proposed: null
-    confidence: 0.0
-    rationale: no candidate matching handled_within_sl_like with unit=count
+    proposed: SUM_CONTACTS_ANSWERED_IN_X
+    confidence: 0.7
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | SUM_CONTACTS_ANSWERED_IN_X\
+      \ | TRAP: Same X-threshold consideration as AbandonedShort \u2014 X is configured\
+      \ per report."
     needs_review: true
     needs_human: true
     alternates: []
@@ -68,40 +80,35 @@ proposals:
       confidence: 0.48
       note: 'alternate first-component match: Talk Time'
   HoldTime:
-    proposed: SUM_INTERACTION_AND_HOLD_TIME
-    confidence: 0.48
-    rationale: 'best hold_time_like match: SUM_INTERACTION_AND_HOLD_TIME (weight=0.48)'
-    needs_review: true
-    needs_human: true
-    alternates:
-    - formula: INTERACTION_AND_HOLD_TIME
-      confidence: 0.48
-      note: 'alternate hold_time_like match: INTERACTION_AND_HOLD_TIME'
-    - formula: AVG_HOLD_TIME
-      confidence: 0.48
-      note: 'alternate hold_time_like match: AVG_HOLD_TIME'
-    - formula: SUM_HOLD_TIME
-      confidence: 0.48
-      note: 'alternate hold_time_like match: SUM_HOLD_TIME'
-    - formula: Contact Hold Time
-      confidence: 0.48
-      note: 'alternate hold_time_like match: Contact Hold Time'
-  WorkTime:
-    proposed: AFTER_CONTACT_WORK_TIME
-    confidence: 0.48
-    rationale: 'best acw_time_like match: AFTER_CONTACT_WORK_TIME (weight=0.48)'
-    needs_review: true
-    needs_human: true
-    alternates:
-    - formula: AVG_AFTER_CONTACT_WORK_TIME
-      confidence: 0.48
-      note: 'alternate acw_time_like match: AVG_AFTER_CONTACT_WORK_TIME'
-  QueueDelayTime:
-    proposed: ESTIMATED_WAIT_TIME
-    confidence: 0.78
-    rationale: 'best queue_delay_time_like match: ESTIMATED_WAIT_TIME (weight=0.78)'
+    proposed: SUM_HOLD_TIME
+    confidence: 0.95
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | SUM_HOLD_TIME\
+      \ | TRAP: SUM_HOLD_TIME is customer-hold time AFTER connect-to-agent; it excludes\
+      \ queue wait time. That matches NICE HoldTime semantics \u2014 but note Amazon\
+      \ separately has AVG_HOLD_TIME (average) \u2014 do NOT confuse the two."
     needs_review: false
     needs_human: false
+    alternates: []
+  WorkTime:
+    proposed: AFTER_CONTACT_WORK_TIME
+    confidence: 0.95
+    rationale: 'dialect override from ontology/amazonconnect_dialect.yaml | AFTER_CONTACT_WORK_TIME
+      | TRAP: ACW only. Never merged into HandleTime. Amazon Connect''s ACW starts
+      automatically when the conversation ends and stops when the agent changes status.'
+    needs_review: false
+    needs_human: false
+    alternates: []
+  QueueDelayTime:
+    proposed: QUEUE_ANSWER_TIME
+    confidence: 0.7
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | QUEUE_ANSWER_TIME\
+      \ | TRAP: QUEUE_ANSWER_TIME is an AVERAGE (avg wait-to-answer per contact);\
+      \ NICE canonical QueueDelayTime unit is duration_seconds \u2014 need to confirm\
+      \ whether NICE expects total-wait-across-contacts or average. If total is needed,\
+      \ multiply by CONTACTS_HANDLED (or use the 'aggregated on ENQUEUE timestamp'\
+      \ variant). Also excludes IVR time by Amazon's definition."
+    needs_review: true
+    needs_human: true
     alternates: []
   ContactsActive:
     proposed: ACTIVE_AI_AGENTS

@@ -4,53 +4,42 @@ meta:
   report: agentqueue
   status: proposed
   produced_by: lexicon-discover
-  produced_at: '2026-08-09T18:12:23+00:00'
+  produced_at: '2026-08-14T11:58:04+00:00'
 fields:
-  AgentValue: AGENT_ANSWER_RATE
-  Handled: API_CONTACTS_HANDLED
+  QueueValue: QueueArn
+  AgentValue: AgentArn
+  Handled: CONTACTS_HANDLED
   HandleTime: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
-  HoldTime: SUM_INTERACTION_AND_HOLD_TIME
+  HoldTime: SUM_HOLD_TIME
   WorkTime: AFTER_CONTACT_WORK_TIME
 proposals:
   QueueValue:
-    proposed: null
-    confidence: 0.0
-    rationale: no candidate matching queue_key_like with unit=key
+    proposed: QueueArn
+    confidence: 0.7
+    rationale: 'dialect override from ontology/amazonconnect_dialect.yaml | QueueArn
+      (grouping dimension) | TRAP: Same dimension caveat as queue.QueueValue.'
     needs_review: true
     needs_human: true
     alternates: []
   AgentValue:
-    proposed: AGENT_ANSWER_RATE
-    confidence: 0.78
-    rationale: 'best agent_key_like match: AGENT_ANSWER_RATE (weight=0.78)'
-    needs_review: false
-    needs_human: false
-    alternates:
-    - formula: AI_AGENT_INVOCATION_SUCCESS_RATE
-      confidence: 0.78
-      note: 'alternate agent_key_like match: AI_AGENT_INVOCATION_SUCCESS_RATE'
-  Handled:
-    proposed: API_CONTACTS_HANDLED
-    confidence: 0.56
-    rationale: 'best handled_total_like match: API_CONTACTS_HANDLED (weight=0.56)'
+    proposed: AgentArn
+    confidence: 0.7
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | AgentArn\
+      \ (grouping dimension, not a metric) | TRAP: Amazon Connect uses Agent ARN /\
+      \ User ARN as the agent identifier \u2014 confirm the exact column name (Agent\
+      \ ARN vs User Id vs Login) against your export."
     needs_review: true
     needs_human: true
-    alternates:
-    - formula: CALLBACK_CONTACTS_HANDLED
-      confidence: 0.56
-      note: 'alternate handled_total_like match: CALLBACK_CONTACTS_HANDLED'
-    - formula: CONTACTS_HANDLED
-      confidence: 0.56
-      note: 'alternate handled_total_like match: CONTACTS_HANDLED'
-    - formula: CONTACTS_HANDLED_INCOMING
-      confidence: 0.56
-      note: 'alternate handled_total_like match: CONTACTS_HANDLED_INCOMING'
-    - formula: CONTACTS_HANDLED_OUTBOUND
-      confidence: 0.56
-      note: 'alternate handled_total_like match: CONTACTS_HANDLED_OUTBOUND'
-    - formula: HUMAN_ANSWERED_CALLS
-      confidence: 0.56
-      note: 'alternate handled_total_like match: HUMAN_ANSWERED_CALLS'
+    alternates: []
+  Handled:
+    proposed: CONTACTS_HANDLED
+    confidence: 0.7
+    rationale: 'dialect override from ontology/amazonconnect_dialect.yaml | CONTACTS_HANDLED
+      (grouped by agent+queue) | TRAP: Verify CONTACTS_HANDLED counts general handled,
+      not just callback (see queue.HandledLong note).'
+    needs_review: true
+    needs_human: true
+    alternates: []
   HandleTime:
     proposed: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
     confidence: 0.48
@@ -69,31 +58,18 @@ proposals:
       confidence: 0.48
       note: 'alternate first-component match: Talk Time'
   HoldTime:
-    proposed: SUM_INTERACTION_AND_HOLD_TIME
-    confidence: 0.48
-    rationale: 'best hold_time_like match: SUM_INTERACTION_AND_HOLD_TIME (weight=0.48)'
-    needs_review: true
-    needs_human: true
-    alternates:
-    - formula: INTERACTION_AND_HOLD_TIME
-      confidence: 0.48
-      note: 'alternate hold_time_like match: INTERACTION_AND_HOLD_TIME'
-    - formula: AVG_HOLD_TIME
-      confidence: 0.48
-      note: 'alternate hold_time_like match: AVG_HOLD_TIME'
-    - formula: SUM_HOLD_TIME
-      confidence: 0.48
-      note: 'alternate hold_time_like match: SUM_HOLD_TIME'
-    - formula: Contact Hold Time
-      confidence: 0.48
-      note: 'alternate hold_time_like match: Contact Hold Time'
+    proposed: SUM_HOLD_TIME
+    confidence: 0.95
+    rationale: 'dialect override from ontology/amazonconnect_dialect.yaml | SUM_HOLD_TIME
+      | TRAP: Customer-hold only. Amazon Connect does not separately expose agent-side
+      hold vs customer-side hold at the metric level.'
+    needs_review: false
+    needs_human: false
+    alternates: []
   WorkTime:
     proposed: AFTER_CONTACT_WORK_TIME
-    confidence: 0.48
-    rationale: 'best acw_time_like match: AFTER_CONTACT_WORK_TIME (weight=0.48)'
-    needs_review: true
-    needs_human: true
-    alternates:
-    - formula: AVG_AFTER_CONTACT_WORK_TIME
-      confidence: 0.48
-      note: 'alternate acw_time_like match: AVG_AFTER_CONTACT_WORK_TIME'
+    confidence: 0.95
+    rationale: dialect override from ontology/amazonconnect_dialect.yaml | AFTER_CONTACT_WORK_TIME
+    needs_review: false
+    needs_human: false
+    alternates: []

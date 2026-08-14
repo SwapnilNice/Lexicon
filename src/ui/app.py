@@ -76,6 +76,29 @@ def strip_html(text: str) -> str:
     return re.sub(r"\s+", " ", text)
 
 
+def extract_fields_from_rest_api_doc(text: str) -> dict:
+    """Match REST/OpenAPI rendered docs: 'field_name type — description' (Zoom, Salesforce, etc.)"""
+    TYPE_PAT = r"(?:string|integer|number|boolean|array|object|enum)"
+    SEP_PAT = r"[—–\-]{1,2}"
+    pattern = re.compile(rf"\b([a-z][a-z0-9_]{{2,40}})\s+{TYPE_PAT}[^—–\n]{{0,30}}{SEP_PAT}\s+")
+    STOP = {"string", "integer", "number", "boolean", "array", "object", "null",
+            "format", "example", "default", "items", "required", "optional"}
+    matches = list(pattern.finditer(text))
+    if not matches:
+        return {}
+    fields = {}
+    for i, m in enumerate(matches):
+        name = m.group(1)
+        if name in STOP:
+            continue
+        desc_start = m.end()
+        desc_end = matches[i + 1].start() if i + 1 < len(matches) else desc_start + 300
+        desc = re.sub(r"\s+", " ", text[desc_start:desc_end]).strip()[:200]
+        if len(desc) > 5:
+            fields[name] = desc
+    return fields
+
+
 def extract_fields(content: str, filename_hint: str = "") -> dict:
     """Dispatch by content shape."""
     lower = filename_hint.lower()
@@ -85,6 +108,10 @@ def extract_fields(content: str, filename_hint: str = "") -> dict:
         content = strip_html(content)
     # Try markdown-style first (works for AWS and many other doc sites' .md variant)
     fields = extract_fields_from_markdown(content)
+    if fields:
+        return fields
+    # Second try: REST/OpenAPI rendered docs — field_name type — description (Zoom, Salesforce, etc.)
+    fields = extract_fields_from_rest_api_doc(content)
     if fields:
         return fields
     # Fallback: any SCREAMING_SNAKE_CASE token in backticks
