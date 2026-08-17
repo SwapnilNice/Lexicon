@@ -111,6 +111,8 @@ tag_keywords:
     - servicelevel
     - handled_sl
     - sl_handled
+    - answered_in         # e.g. SUM_CONTACTS_ANSWERED_IN_X (Amazon Connect)
+    - insla               # e.g. callsHandledInSLA (Five9)
 
   abandoned_total_like:
     - abandoned
@@ -123,6 +125,14 @@ tag_keywords:
     - slvlabns            # Avaya
     - sl_abandoned
     - within_sl_abandoned
+    - withinsl            # e.g. nAbandonedWithinSL (Genesys)
+    - abandoned_in        # e.g. SUM_CONTACTS_ABANDONED_IN_X (Amazon Connect)
+    - insla               # e.g. callsAbandonedInSLA (Five9)
+
+  contacts_received_like:
+    - queued              # e.g. CONTACTS_QUEUED (Amazon Connect)
+    - offered             # e.g. nOffered (Genesys)
+    - noffered            # Genesys exact token
 
   contacts_active_like:
     - contactsactive      # Avaya

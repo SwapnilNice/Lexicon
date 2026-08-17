@@ -33,7 +33,7 @@ queue:
     definition: "Contacts that entered the router for this queue during the interval."
     unit: count
     xml: "<ContactsReceived><count>..</count></ContactsReceived>"
-    media: { immediate_response: not_required, deferrable_response: required, outbound_campaign: not_required, outbound: not_required }
+    media: { immediate_response: required_if_available, deferrable_response: required, outbound_campaign: not_required, outbound: not_required }
 
   AbandonedShort:
     definition: "Abandoned before the grade-of-service (short) threshold."

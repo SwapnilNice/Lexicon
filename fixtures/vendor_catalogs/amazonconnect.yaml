@@ -3,7 +3,7 @@ meta:
   vendor: amazonconnect
   resolved_via: registry
   produced_by: lexicon-discover
-  produced_at: '2026-08-14T12:07:20+00:00'
+  produced_at: '2026-08-17T08:13:41+00:00'
   sources:
   - kind: html_doc
     url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -1166,9 +1166,7 @@ fields:
       non-talk time in a voice conversation.'
     unit: duration_seconds
     unit_confidence: 0.6
-    semantic_tags:
-    - tag: talk_time_like
-      weight: 0.8
+    semantic_tags: []
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -1658,6 +1656,8 @@ fields:
     semantic_tags:
     - tag: abandoned_total_like
       weight: 1.0
+    - tag: abandoned_within_sl_like
+      weight: 0.6
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -1685,6 +1685,8 @@ fields:
       weight: 0.8
     - tag: handled_total_like
       weight: 0.8
+    - tag: handled_within_sl_like
+      weight: 0.6
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -1852,7 +1854,9 @@ fields:
       range.
     unit: count
     unit_confidence: 0.5
-    semantic_tags: []
+    semantic_tags:
+    - tag: contacts_received_like
+      weight: 0.8
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -1864,7 +1868,9 @@ fields:
       placed in the queue, updated as soon as a contact is enqueued.'
     unit: unknown
     unit_confidence: 0.0
-    semantic_tags: []
+    semantic_tags:
+    - tag: contacts_received_like
+      weight: 0.8
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -2164,7 +2170,9 @@ fields:
       a contact spent waiting in the queue.'
     unit: duration_seconds
     unit_confidence: 0.6
-    semantic_tags: []
+    semantic_tags:
+    - tag: contacts_received_like
+      weight: 0.8
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -2205,9 +2213,7 @@ fields:
       a voice conversation as a percent of the total conversation duration.'
     unit: percentage
     unit_confidence: 0.7
-    semantic_tags:
-    - tag: talk_time_like
-      weight: 0.8
+    semantic_tags: []
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -2371,7 +2377,9 @@ fields:
       a specific routing step in the queue.'
     unit: unknown
     unit_confidence: 0.0
-    semantic_tags: []
+    semantic_tags:
+    - tag: contacts_received_like
+      weight: 0.8
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.md
@@ -2610,9 +2618,7 @@ fields:
     description: This metric provides the total non-talk time in a voice conversation.
     unit: duration_seconds
     unit_confidence: 0.6
-    semantic_tags:
-    - tag: talk_time_like
-      weight: 0.8
+    semantic_tags: []
     traps: []
     sources:
     - url: https://docs.aws.amazon.com/connect/latest/adminguide/metric-primitive-definitions.md

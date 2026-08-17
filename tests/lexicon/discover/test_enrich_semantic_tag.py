@@ -56,5 +56,41 @@ def test_lexicon_covers_required_concepts():
         "login_time_like", "handled_total_like", "handled_within_sl_like",
         "abandoned_total_like", "abandoned_within_sl_like",
         "queue_key_like", "agent_key_like", "contacts_active_like",
+        "contacts_received_like",
     }
     assert required.issubset(set(TAG_LEXICON()))
+
+
+def test_negation_prefix_zeroes_tag():
+    """A keyword preceded by a negation prefix in the field name must score 0."""
+    fields = [_f("avg_non_talk_time", "Average non-talk time per contact.")]
+    tag_fields(fields)
+    tags = {t.tag for t in fields[0].semantic_tags}
+    assert "talk_time_like" not in tags
+
+
+def test_within_sl_abandon_tagged():
+    """Fields with within-SL abandon patterns must tag abandoned_within_sl_like."""
+    cases = [
+        ("sum_contacts_abandoned_in_x", "Contacts abandoned within threshold X seconds."),
+        ("calls_abandoned_insla", "Calls abandoned within SLA threshold."),
+        ("nAbandonedWithinSL", "Number of contacts abandoned within service level."),
+    ]
+    for name, desc in cases:
+        fields = [_f(name, desc)]
+        tag_fields(fields)
+        tags = {t.tag for t in fields[0].semantic_tags}
+        assert "abandoned_within_sl_like" in tags, f"{name} not tagged abandoned_within_sl_like"
+
+
+def test_contacts_received_tagged():
+    """Fields with 'queued' or 'offered' patterns must tag contacts_received_like."""
+    cases = [
+        ("contacts_queued", "Number of contacts placed into the queue."),
+        ("nOffered", "Contacts offered to the queue."),
+    ]
+    for name, desc in cases:
+        fields = [_f(name, desc)]
+        tag_fields(fields)
+        tags = {t.tag for t in fields[0].semantic_tags}
+        assert "contacts_received_like" in tags, f"{name} not tagged contacts_received_like"

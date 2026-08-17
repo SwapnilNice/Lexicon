@@ -4,7 +4,7 @@ meta:
   report: queue
   status: proposed
   produced_by: lexicon-discover
-  produced_at: '2026-08-14T09:26:33+00:00'
+  produced_at: '2026-08-17T08:13:59+00:00'
 fields:
   QueueValue: skill
   AbandonedShort: callsAbandonedInSLA
@@ -22,6 +22,13 @@ proposals:
     confidence: 0.7
     rationale: dialect override from ontology/five9_dialect.yaml | Skill name (Five9's
       routing entity for queue-style routing) or Campaign name for outbound.
+    needs_review: true
+    needs_human: true
+    alternates: []
+  ContactsReceived:
+    proposed: null
+    confidence: 0.0
+    rationale: no candidate matching contacts_received_like with unit=count
     needs_review: true
     needs_human: true
     alternates: []

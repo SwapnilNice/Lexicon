@@ -47,6 +47,7 @@ LEAF_TAG_MAP: dict[str, str] = {
     "HandledLong": "handled_total_like",   # arithmetic handled below
     "AbandonedShort": "abandoned_within_sl_like",
     "AbandonedLong": "abandoned_total_like",  # arithmetic below
+    "ContactsReceived": "contacts_received_like",
     "ContactsActive": "contacts_active_like",
     "InternalContacts": "internal_count_like",
     "OutboundContacts": "outbound_count_like",

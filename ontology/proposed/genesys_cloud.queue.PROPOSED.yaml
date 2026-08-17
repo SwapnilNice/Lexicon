@@ -4,9 +4,10 @@ meta:
   report: queue
   status: proposed
   produced_by: lexicon-discover
-  produced_at: '2026-08-09T19:13:50+00:00'
+  produced_at: '2026-08-17T08:14:09+00:00'
 fields:
   QueueValue: queueId
+  ContactsReceived: offeredPerInterval
   AbandonedLong: abandoned
   HandledShort: serviceLevel
   HandledLong: communicationAnsweredEvents - serviceLevel
@@ -92,6 +93,19 @@ proposals:
     - formula: routingSkill
       confidence: 0.4
       note: 'alternate queue_key_like match: routingSkill'
+  ContactsReceived:
+    proposed: offeredPerInterval
+    confidence: 0.56
+    rationale: 'best contacts_received_like match: offeredPerInterval (weight=0.56)'
+    needs_review: true
+    needs_human: true
+    alternates:
+    - formula: offeredPerDay
+      confidence: 0.56
+      note: 'alternate contacts_received_like match: offeredPerDay'
+    - formula: offeredShifts
+      confidence: 0.56
+      note: 'alternate contacts_received_like match: offeredShifts'
   AbandonedShort:
     proposed: null
     confidence: 0.0

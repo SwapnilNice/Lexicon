@@ -4,14 +4,15 @@ meta:
   report: queue
   status: proposed
   produced_by: lexicon-discover
-  produced_at: '2026-08-14T12:07:20+00:00'
+  produced_at: '2026-08-17T08:13:41+00:00'
 fields:
   QueueValue: QueueArn
+  ContactsReceived: CONTACTS_QUEUED
   AbandonedShort: SUM_CONTACTS_ABANDONED_IN_X
-  AbandonedLong: AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS
+  AbandonedLong: CONTACTS_ABANDONED - SUM_CONTACTS_ABANDONED_IN_X
   HandledShort: SUM_CONTACTS_ANSWERED_IN_X
-  HandledLong: API_CONTACTS_HANDLED
-  HandleTime: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
+  HandledLong: CONTACTS_HANDLED - SUM_CONTACTS_ANSWERED_IN_X
+  HandleTime: SUM_HANDLE_TIME - AFTER_CONTACT_WORK_TIME
   HoldTime: SUM_HOLD_TIME
   WorkTime: AFTER_CONTACT_WORK_TIME
   QueueDelayTime: QUEUE_ANSWER_TIME
@@ -29,6 +30,17 @@ proposals:
     needs_review: true
     needs_human: true
     alternates: []
+  ContactsReceived:
+    proposed: CONTACTS_QUEUED
+    confidence: 0.7
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | CONTACTS_QUEUED\
+      \ | TRAP: CONTACTS_QUEUED counts contacts placed in the queue (EnqueueTimestamp\
+      \ present). NICE ContactsReceived is 'entered the router' \u2014 subtly different\
+      \ (Amazon queue enqueue happens AFTER routing decision). For inbound voice this\
+      \ canonical field is not_required, so approximation is acceptable."
+    needs_review: true
+    needs_human: true
+    alternates: []
   AbandonedShort:
     proposed: SUM_CONTACTS_ABANDONED_IN_X
     confidence: 0.7
@@ -39,10 +51,13 @@ proposals:
     needs_human: true
     alternates: []
   AbandonedLong:
-    proposed: AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS
-    confidence: 0.34
-    rationale: total-only fallback (AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS);
-      within-SL split missing
+    proposed: CONTACTS_ABANDONED - SUM_CONTACTS_ABANDONED_IN_X
+    confidence: 0.7
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | CONTACTS_ABANDONED\
+      \ - SUM_CONTACTS_ABANDONED_IN_X | TRAP: The AWS docs page has multiple 'Contacts\
+      \ abandoned' entries \u2014 the general CONTACTS_ABANDONED counts ALL queued+disconnected\
+      \ contacts (not just first-callback). Verify against your GetMetricDataV2 usage.\
+      \ If SL split isn't wanted, put total CONTACTS_ABANDONED here and empty in AbandonedShort."
     needs_review: true
     needs_human: true
     alternates: []
@@ -56,29 +71,30 @@ proposals:
     needs_human: true
     alternates: []
   HandledLong:
-    proposed: API_CONTACTS_HANDLED
-    confidence: 0.34
-    rationale: total-only fallback (API_CONTACTS_HANDLED); within-SL split missing
+    proposed: CONTACTS_HANDLED - SUM_CONTACTS_ANSWERED_IN_X
+    confidence: 0.7
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | CONTACTS_HANDLED\
+      \ - SUM_CONTACTS_ANSWERED_IN_X | TRAP: CONTACTS_HANDLED in the AWS docs is described\
+      \ under 'customer first callback' \u2014 verify it's the general handled count\
+      \ when you query it, not the callback-specific one. If SL split not wanted,\
+      \ put total CONTACTS_HANDLED here."
     needs_review: true
     needs_human: true
     alternates: []
   HandleTime:
-    proposed: AVG_NON_TALK_TIME + SUM_INTERACTION_AND_HOLD_TIME
-    confidence: 0.48
-    rationale: composed from ['AVG_NON_TALK_TIME', 'SUM_INTERACTION_AND_HOLD_TIME']
-      per derivation
-    needs_review: true
-    needs_human: true
-    alternates:
-    - formula: AVG_TALK_TIME
-      confidence: 0.48
-      note: 'alternate first-component match: AVG_TALK_TIME'
-    - formula: Non-Talk Time
-      confidence: 0.48
-      note: 'alternate first-component match: Non-Talk Time'
-    - formula: Talk Time
-      confidence: 0.48
-      note: 'alternate first-component match: Talk Time'
+    proposed: SUM_HANDLE_TIME - AFTER_CONTACT_WORK_TIME
+    confidence: 0.95
+    rationale: "dialect override from ontology/amazonconnect_dialect.yaml | SUM_HANDLE_TIME\
+      \ - AFTER_CONTACT_WORK_TIME | TRAP: CRITICAL: Amazon Connect's SUM_HANDLE_TIME\
+      \ INCLUDES ACW (and agent pause for tasks). NICE HandleTime is talk+hold ONLY,\
+      \ EXCLUDES ACW. Must subtract AFTER_CONTACT_WORK_TIME. For voice (immediate_response\
+      \ media scope), agent pause is 0 so this formula is correct; for task-media\
+      \ the formula would need to also subtract agent pause. Do NOT use SUM_HANDLE_TIME\
+      \ straight (like the AI proposed) \u2014 it will over-count by however much\
+      \ ACW occurred."
+    needs_review: false
+    needs_human: false
+    alternates: []
   HoldTime:
     proposed: SUM_HOLD_TIME
     confidence: 0.95
